@@ -264,7 +264,7 @@ class Player {
 						this.ui.locs.heart.y * 8,
 						8, // The 8x8 pixel dimensions of that sub-image.
 						8,
-						1 + i * 8, // Proper placement of the tile on screen.
+						1 + i * 8 + i, // Proper placement of the tile on screen.
 						1,
 						8, // The size of the tile, as drawn on screen.
 						8
