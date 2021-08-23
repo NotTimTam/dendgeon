@@ -51,6 +51,8 @@ function renderLoop() {
 	items.render(ctx); // Render all the items in the game.
 	player.render(ctx); // Render the player.
 
+	player.renderUI(ctx); // Render the player's UI.
+
 	window.requestAnimationFrame(renderLoop);
 }
 window.requestAnimationFrame(renderLoop);

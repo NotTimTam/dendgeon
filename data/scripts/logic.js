@@ -55,11 +55,41 @@ const cartesian2 = (angle, velocity) => {
 	};
 };
 
+// Global Objects.
+
+// Tilemaps and Spritesheets.
+class Sheet {
+	constructor(src, locs) {
+		this.loaded = false;
+		this.src = src;
+		this.map = undefined;
+		this.locs = locs;
+
+		this.load();
+	}
+
+	load = () => {
+		let img = new Image();
+		img.onload = () => {
+			this.map = img;
+			this.loaded = true;
+		};
+		img.src = `./data/images/${this.src}.png`;
+	};
+}
+
+// Specific Objects.
+
 // Player.
 class Player {
 	constructor(x, y) {
 		// Load the player's spritesheet.
 		this.load_spritesheet();
+
+		// Load the UI spritesheet.
+		this.ui = new Sheet("spritesheet_ui", {
+			heart: { x: 0, y: 0 },
+		});
 
 		// Animation handling.
 		this.animation = {
@@ -100,6 +130,7 @@ class Player {
 
 		// Max movement speed.
 		this.speed = 2;
+		this.speed > 8 ? (this.speed = 8) : "";
 
 		// What tile the player is mostly standing on.
 		this.tilePos = {};
@@ -114,7 +145,9 @@ class Player {
 		};
 
 		// Player inventory.
-		this.inventory = [];
+		this.inventory = {
+			health: 3,
+		};
 	}
 
 	// Load the image source for the spritesheet. Should be done before any rendering is attempted. But the rendering is given a try catch since JS is asynchronous.
@@ -215,6 +248,36 @@ class Player {
 		return false;
 	}
 
+	// Render the player's ui.
+	renderUI(ctx) {
+		// Health.
+
+		// Draw each heart.
+		if (this.inventory.health > 0) {
+			for (let i = 0; i < this.inventory.health; i++) {
+				try {
+					ctx.beginPath();
+
+					ctx.drawImage(
+						this.ui.map, // The tilemap image.
+						this.ui.locs.heart.x * 8, // The position of the sub-image in the map.
+						this.ui.locs.heart.y * 8,
+						8, // The 8x8 pixel dimensions of that sub-image.
+						8,
+						1 + i * 8, // Proper placement of the tile on screen.
+						1,
+						8, // The size of the tile, as drawn on screen.
+						8
+					);
+
+					ctx.closePath();
+				} catch {}
+			}
+		}
+
+		// Alpha text.
+	}
+
 	input() {
 		// Store the player's current positon;
 		this.physics.lastX = this.x;
@@ -252,6 +315,11 @@ class Player {
 	}
 
 	logic() {
+		// Inventory data.
+		this.inventory.health % 1 !== 0 &&
+			(this.inventory.health = Math.floor(this.inventory.health));
+
+		// Positional data.
 		this.x = Math.round(this.x);
 		this.y = Math.round(this.y);
 
