@@ -21,12 +21,54 @@ const AABB = (rect1, rect2) => {
 	}
 };
 
+const deg = (radian) => {
+	return radian * (180 / Math.PI);
+};
+
+const vector2 = (x, y) => {
+	return {
+		dirRadian: Math.atan2(y, x),
+		dirDegree: deg(Math.atan2(y, x)),
+		velocity: Math.sqrt(x ** 2 + y ** 2),
+	};
+};
+
 // Player.
 class Player {
 	constructor(x, y) {
+		// Load the player's spritesheet.
+		this.load_spritesheet();
+
+		// Animation handling.
+		this.animation = {
+			map: undefined,
+			name: "stand", // The name of the current animation.
+			frame: 0, // The frame of the current animation.
+			speed: 0, // The speed of the current animation.
+			overallSpeed: 4, // The top speed of an animation, calculated with the current speed of the player in mind. (lower numbers are faster)
+			direction: 0, // The direction the animation should be facing.
+			tick: 0, // The current position in the frame.
+			frameCounts: {
+				// How many frames are in each animation, and at what frame they start.
+				stand: {
+					start: 0,
+					end: 0,
+				},
+				walk: {
+					start: 1,
+					end: 3,
+				},
+			},
+		};
+
 		// The player's position on-screen/in-game.
 		this.x = x;
 		this.y = y;
+		this.physics = {
+			lastX: 0,
+			lastY: 0,
+			velocity: 0,
+		};
 
 		// What tile the player is mostly standing on.
 		this.tilePos = {};
@@ -42,6 +84,52 @@ class Player {
 		};
 	}
 
+	load_spritesheet = () => {
+		let img = new Image();
+		img.onload = () => {
+			this.animation.map = img;
+		};
+		img.src = "./data/images/spritesheet_player.png";
+	};
+
+	// Handle animations
+	animate() {
+		// Match the animation speed to the player's movement speed.
+		this.animation.speed =
+			(player.physics.velocity.velocity / player.speed) *
+			this.animation.overallSpeed;
+
+		// Update animation steps.
+		this.animation.tick++; // Add to the tick.
+
+		// Move to the next frame if the speed/tick counter completes.
+		if (this.animation.tick > this.animation.speed) {
+			this.animation.tick = 0;
+			this.animation.frame++;
+		}
+
+		// Determine which animation should be playing.
+		if (this.physics.velocity.velocity < 0.01) {
+			this.animation.name = "stand";
+		} else {
+			this.animation.name = "walk";
+		}
+
+		// If we have finished an animation, restart it.
+		if (
+			this.animation.frame >
+			this.animation.frameCounts[this.animation.name].end
+		) {
+			// BREAKDOWN:
+			/*  
+                where the data for framecounts is stored      the name of the currently playing animation       the frame start or end position of the animation.
+                this.animation.frameCounts                    [this.animation.name]                             start/end
+            */
+			this.animation.frame =
+				this.animation.frameCounts[this.animation.name].start;
+		}
+	}
+
 	// Check for a collision in a direction.
 	checkCol(dir) {
 		// The hypothetical bounding box, or where the player would be if the movement was applied.
@@ -52,8 +140,10 @@ class Player {
 			height: 8,
 		};
 
+		// The tile position in the world the player would be in if we moved.
 		let hbbTilePos = worldToTile(hbb.x, hbb.y);
 
+		// Apply hypothetical movement to the hypothetical position and grab the tile that is in front of the player in that direction.
 		switch (dir) {
 			case 0:
 				hbb.y -= this.speed;
@@ -75,11 +165,13 @@ class Player {
 				break;
 		}
 
+		// Get the the actual tile from the global tile array.
 		this.goalTile = world.getTile(
 			Math.round(this.goalTile.x * 8),
 			Math.round(this.goalTile.y * 8)
 		);
 
+		// Check for collisions and return the outcome.
 		if (this.goalTile === undefined) {
 			return false;
 		} else if (AABB(hbb, this.goalTile) && this.goalTile.data.solid) {
@@ -90,6 +182,10 @@ class Player {
 	}
 
 	input() {
+		// Store the player's current positon;
+		this.physics.lastX = this.x;
+		this.physics.lastY = this.y;
+
 		// Check for collisions in the direction of travel and then apply the travel if there are none.
 		if (keyboard.ArrowUp || keyboard.w) {
 			if (!this.checkCol(0)) {
@@ -99,6 +195,7 @@ class Player {
 		if (keyboard.ArrowRight || keyboard.d) {
 			if (!this.checkCol(1)) {
 				this.x += this.speed;
+				this.animation.direction = 1; // Set the player's animation direction.
 			}
 		}
 		if (keyboard.ArrowDown || keyboard.s) {
@@ -109,8 +206,15 @@ class Player {
 		if (keyboard.ArrowLeft || keyboard.a) {
 			if (!this.checkCol(3)) {
 				this.x -= this.speed;
+				this.animation.direction = -1; // Set the player's animation direction.
 			}
 		}
+
+		// Calculate the player's velocity.
+		this.physics.velocity = vector2(
+			Math.abs(this.x - this.physics.lastX),
+			Math.abs(this.y - this.physics.lastY)
+		);
 	}
 
 	logic() {
@@ -121,21 +225,40 @@ class Player {
 
 		this.camera.x = Math.round(this.x - 60);
 		this.camera.y = Math.round(this.y - 60);
+
+		this.animate();
 	}
 
 	render(ctx) {
-		ctx.beginPath();
+		try {
+			ctx.beginPath();
 
-		ctx.fillStyle = "red";
+			// ctx.fillStyle = "red";
 
-		ctx.fillRect(
-			Math.round(this.x - this.camera.x),
-			Math.round(this.y - this.camera.y),
-			8,
-			8
-		);
+			// ctx.fillRect(
+			// 	Math.round(this.x - this.camera.x),
+			// 	Math.round(this.y - this.camera.y),
+			// 	8,
+			// 	8
+			// );
 
-		ctx.closePath();
+			ctx.drawImage(
+				this.animation.map, // The tilemap image.
+				this.animation.frame * 8 +
+					(this.animation.direction === 1 && 32), // The x and y sub-coordinates to grab the tile's texture from the image.
+				0,
+				8, // The 8x8 pixel dimensions of that sub-image.
+				8,
+				this.x - this.camera.x, // Proper placement of the tile on screen.
+				this.y - this.camera.y,
+				8, // The size of the tile, as drawn on screen.
+				8
+			);
+
+			ctx.closePath();
+		} catch {
+			return;
+		}
 
 		// ctx.beginPath();
 		// ctx.strokeStyle = "green";
@@ -334,12 +457,12 @@ tiles.load();
 const rooms = {
 	dev_room: [
 		[8, 13, 13, 13, 13, 13, 13, 9],
-		[12, 1, 2, 1, 2, 1, 2, 12],
-		[12, 1, 1, 1, 1, 1, 1, 12],
-		[12, 1, 2, 1, 2, 1, 2, 12],
-		[12, 1, 1, 1, 1, 1, 1, 12],
-		[12, 1, 2, 1, 2, 1, 2, 12],
-		[12, 1, 1, 1, 1, 1, 1, 12],
+		[12, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 12],
+		[12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12],
+		[12, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 12],
+		[12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12],
+		[12, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 12],
+		[12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12],
 		[11, 13, 13, 13, 13, 13, 13, 10],
 	],
 };
