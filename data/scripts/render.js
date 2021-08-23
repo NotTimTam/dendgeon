@@ -35,6 +35,45 @@ function clearCanvas() {
 	ctx.closePath();
 }
 
+// Render text.
+const nums = new Sheet("spritesheet_nums", {
+	0: { x: 0, y: 0 },
+	1: { x: 1, y: 0 },
+	2: { x: 2, y: 0 },
+	3: { x: 3, y: 0 },
+	4: { x: 4, y: 0 },
+	5: { x: 5, y: 0 },
+	6: { x: 6, y: 0 },
+	7: { x: 7, y: 0 },
+	8: { x: 8, y: 0 },
+	9: { x: 9, y: 0 },
+});
+
+function renderNumber(x, y, number) {
+	x = Math.round(x);
+	y = Math.round(y);
+
+	let numArray = number.toString().split("");
+
+	for (let i = 0; i < numArray.length; i++) {
+		ctx.beginPath();
+
+		ctx.drawImage(
+			nums.map, // The tilemap image.
+			nums.locs[numArray[i]].x * 8, // The position of the sub-image in the map.
+			nums.locs[numArray[i]].y * 8,
+			8, // The 8x8 pixel dimensions of that sub-image.
+			8,
+			Math.round(x + i * 8 + i), // Proper placement of the tile on screen.
+			Math.round(y),
+			8, // The size of the tile, as drawn on screen.
+			8
+		);
+
+		ctx.closePath();
+	}
+}
+
 // Render loop.
 function renderLoop() {
 	// INPUT.

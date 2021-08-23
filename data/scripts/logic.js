@@ -89,6 +89,7 @@ class Player {
 		// Load the UI spritesheet.
 		this.ui = new Sheet("spritesheet_ui", {
 			heart: { x: 0, y: 0 },
+			coin: { x: 1, y: 0 },
 		});
 
 		// Animation handling.
@@ -147,17 +148,18 @@ class Player {
 		// Player inventory.
 		this.inventory = {
 			health: 3,
+			coin: 0,
 		};
 	}
 
 	// Load the image source for the spritesheet. Should be done before any rendering is attempted. But the rendering is given a try catch since JS is asynchronous.
-	load_spritesheet = () => {
+	load_spritesheet() {
 		let img = new Image();
 		img.onload = () => {
 			this.animation.map = img;
 		};
 		img.src = "./data/images/spritesheet_player.png";
-	};
+	}
 
 	// Handle animations
 	animate() {
@@ -264,7 +266,7 @@ class Player {
 						this.ui.locs.heart.y * 8,
 						8, // The 8x8 pixel dimensions of that sub-image.
 						8,
-						1 + i * 8 + i, // Proper placement of the tile on screen.
+						Math.round(1 + i * 8 + i), // Proper placement of the tile on screen.
 						1,
 						8, // The size of the tile, as drawn on screen.
 						8
@@ -275,7 +277,30 @@ class Player {
 			}
 		}
 
-		// Alpha text.
+		// Coins.
+		try {
+			ctx.beginPath();
+
+			ctx.drawImage(
+				this.ui.map, // The tilemap image.
+				this.ui.locs.coin.x * 8, // The position of the sub-image in the map.
+				this.ui.locs.coin.y * 8,
+				8, // The 8x8 pixel dimensions of that sub-image.
+				8,
+				1, // Proper placement of the tile on screen.
+				Math.round(canvas.height - 9),
+				8, // The size of the tile, as drawn on screen.
+				8
+			);
+
+			ctx.closePath();
+
+			renderNumber(
+				9,
+				canvas.height - 9,
+				this.inventory.coin > 999 ? 999 : this.inventory.coin
+			);
+		} catch {}
 	}
 
 	input() {
@@ -335,15 +360,6 @@ class Player {
 		try {
 			ctx.beginPath();
 
-			// ctx.fillStyle = "red";
-
-			// ctx.fillRect(
-			// 	Math.round(this.x - this.camera.x),
-			// 	Math.round(this.y - this.camera.y),
-			// 	8,
-			// 	8
-			// );
-
 			ctx.drawImage(
 				this.animation.map, // The tilemap image.
 				this.animation.frame * 8 +
@@ -361,35 +377,6 @@ class Player {
 		} catch {
 			return;
 		}
-
-		// ctx.beginPath();
-		// ctx.strokeStyle = "green";
-		// ctx.lineWidth = 0.5;
-		// ctx.rect(
-		// 	this.tilePos.x * 8 - this.camera.x,
-		// 	this.tilePos.y * 8 - this.camera.y,
-		// 	8,
-		// 	8
-		// );
-		// ctx.stroke();
-
-		// ctx.closePath();
-
-		// ctx.beginPath();
-		// ctx.strokeStyle = "orange";
-		// ctx.lineWidth = 0.5;
-		// if (this.goalTile !== undefined) {
-		// 	ctx.rect(
-		// 		(this.goalTile.x / 8) * 8 - this.camera.x,
-		// 		(this.goalTile.y / 8) * 8 - this.camera.y,
-		// 		8,
-		// 		8
-		// 	);
-		// }
-
-		// ctx.stroke();
-
-		// ctx.closePath();
 	}
 }
 
