@@ -370,14 +370,13 @@ class Item {
 		this.expire <= 0 && this.destroy();
 
 		// Move towards the player.
-		if (distance(this.x + 2, this.y + 2, player.x + 4, player.y + 4) < 32) {
+		if (distance(this.x + 2, this.y + 2, player.x + 4, player.y + 4) < 16) {
 			let newPos = cartesian2(
 				angle(
 					{ x: player.x + 4, y: player.y + 4 },
 					{ x: this.x + 2, y: this.y + 2 }
 				),
-				distance(this.x + 2, this.y + 2, player.x + 4, player.y + 4) /
-					12
+				distance(this.x + 2, this.y + 2, player.x + 4, player.y + 4) / 6
 			);
 
 			this.x += newPos.x;
@@ -427,6 +426,15 @@ class ItemManager {
 
 		this.map = undefined;
 		this.load_tilemap();
+
+		for (let i = 0; i < 100; i++) {
+			this.createItem(
+				8 + Math.random() * 93,
+				8 + Math.random() * 45,
+				"coin",
+				Math.ceil(Math.random() * 8)
+			);
+		}
 	}
 
 	// Load the image source for the tilemap. Should be done before any rendering is attempted. But the rendering is given a try catch since JS is asynchronous.
@@ -452,13 +460,6 @@ class ItemManager {
 		while (this.items.length >= 100) {
 			this.items.shift();
 		}
-
-		this.createItem(
-			8 + Math.random() * 93,
-			8 + Math.random() * 45,
-			"coin",
-			Math.ceil(Math.random() * 8)
-		);
 
 		// Run game logic for all items.
 		for (let item of this.items) {
