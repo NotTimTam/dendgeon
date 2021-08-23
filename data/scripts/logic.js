@@ -21,8 +21,23 @@ const AABB = (rect1, rect2) => {
 	}
 };
 
+const angle = (object1, object2) => {
+	return deg(Math.atan2(object1.y - object2.y, object1.x - object2.x));
+};
+
+const randRange = (min, max) => {
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+const distance = (x1, y1, x2, y2) => {
+	return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+};
+
 const deg = (radian) => {
 	return radian * (180 / Math.PI);
+};
+const rad = (degree) => {
+	return degree * (Math.PI / 180);
 };
 
 const vector2 = (x, y) => {
@@ -30,6 +45,13 @@ const vector2 = (x, y) => {
 		dirRadian: Math.atan2(y, x),
 		dirDegree: deg(Math.atan2(y, x)),
 		velocity: Math.sqrt(x ** 2 + y ** 2),
+	};
+};
+
+const cartesian2 = (angle, velocity) => {
+	return {
+		x: velocity * Math.cos(rad(angle)),
+		y: velocity * Math.sin(rad(angle)),
 	};
 };
 
@@ -64,6 +86,10 @@ class Player {
 		// The player's position on-screen/in-game.
 		this.x = x;
 		this.y = y;
+
+		// The player's size for collisions.
+		this.width = 8;
+		this.height = 8;
 
 		// Physics values. Essentially read-only since there aren't any physics in the game.
 		this.physics = {
@@ -342,6 +368,26 @@ class Item {
 		// Tick the item's expiration downward and destroy if necessary.
 		this.expire--;
 		this.expire <= 0 && this.destroy();
+
+		// Move towards the player.
+		if (distance(this.x + 2, this.y + 2, player.x + 4, player.y + 4) < 32) {
+			let newPos = cartesian2(
+				angle(
+					{ x: player.x + 4, y: player.y + 4 },
+					{ x: this.x + 2, y: this.y + 2 }
+				),
+				distance(this.x + 2, this.y + 2, player.x + 4, player.y + 4) /
+					12
+			);
+
+			this.x += newPos.x;
+			this.y += newPos.y;
+
+			// Check for collision with the player.
+			if (AABB(this, player)) {
+				this.collect();
+			}
+		}
 	}
 
 	// Render this item.
@@ -350,15 +396,15 @@ class Item {
 			ctx.beginPath();
 
 			ctx.drawImage(
-				tiles.map, // The tilemap image.
-				tiles.itemIndeces[this.type] !== undefined
-					? tiles.itemIndeces[this.type]
+				items.map, // The tilemap image.
+				items.itemIndeces[this.type] !== undefined
+					? items.itemIndeces[this.type]
 					: 0, // The x and y sub-coordinates to grab the tile's texture from the image.
 				0,
 				4, // The 4x4 pixel dimensions of that sub-image.
 				4,
-				this.x - player.camera.x, // Proper placement of the tile on screen.
-				this.y - player.camera.y,
+				Math.round(this.x - player.camera.x), // Proper placement of the tile on screen.
+				Math.round(this.y - player.camera.y),
 				4, // The size of the tile, as drawn on screen.
 				4
 			);
@@ -383,15 +429,6 @@ class ItemManager {
 		this.load_tilemap();
 	}
 
-	// Add an item to the game.
-	createItem(x, y, type, value) {
-		let item = new Item(x, y, type, value);
-
-		this.items.push(item);
-
-		return item;
-	}
-
 	// Load the image source for the tilemap. Should be done before any rendering is attempted. But the rendering is given a try catch since JS is asynchronous.
 	load_tilemap = () => {
 		let img = new Image();
@@ -401,7 +438,28 @@ class ItemManager {
 		img.src = "./data/images/tilemap_items.png";
 	};
 
+	// Add an item to the game.
+	createItem(x, y, type, value) {
+		let item = new Item(x, y, type, value);
+
+		this.items.push(item);
+
+		return item;
+	}
+
 	logic() {
+		// Check if the max item limit has been reached.
+		while (this.items.length >= 100) {
+			this.items.shift();
+		}
+
+		this.createItem(
+			8 + Math.random() * 93,
+			8 + Math.random() * 45,
+			"coin",
+			Math.ceil(Math.random() * 8)
+		);
+
 		// Run game logic for all items.
 		for (let item of this.items) {
 			item.logic();
@@ -416,7 +474,6 @@ class ItemManager {
 	}
 }
 const items = new ItemManager();
-items.createItem(0, 0, "coin", 1);
 
 // Map.
 const tiles = {
