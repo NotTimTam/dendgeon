@@ -64,11 +64,16 @@ class Player {
 		// The player's position on-screen/in-game.
 		this.x = x;
 		this.y = y;
+
+		// Physics values. Essentially read-only since there aren't any physics in the game.
 		this.physics = {
 			lastX: 0,
 			lastY: 0,
 			velocity: 0,
 		};
+
+		// Max movement speed.
+		this.speed = 2;
 
 		// What tile the player is mostly standing on.
 		this.tilePos = {};
@@ -76,14 +81,17 @@ class Player {
 		// The tile the player is moving towards.
 		this.goalTile = {};
 
-		this.speed = 2;
-
+		// Camera positioning.
 		this.camera = {
 			x: 0,
 			y: 0,
 		};
+
+		// Player inventory.
+		this.inventory = [];
 	}
 
+	// Load the image source for the spritesheet. Should be done before any rendering is attempted. But the rendering is given a try catch since JS is asynchronous.
 	load_spritesheet = () => {
 		let img = new Image();
 		img.onload = () => {
@@ -293,6 +301,123 @@ class Player {
 
 const player = new Player(16, 16);
 
+// Items.
+class Item {
+	constructor(x, y, type = "coin", value = "1") {
+		// Position on the screen.
+		this.x = x;
+		this.y = y;
+
+		// Size for collision detection.
+		this.width = 4;
+		this.height = 4;
+
+		// The type is the thing that is added to in the player's inventory. The value is how much is added.
+		this.type = type;
+		this.value = value;
+
+		// The items expiration. Used to remove lingering items.
+		this.expire = 99999;
+	}
+
+	// Destroy this item.
+	destroy() {
+		items.items.splice(items.items.indexOf(this), 1);
+	}
+
+	// Collect this item into the player's inventory and then destroy it.
+	collect() {
+		// Modify the player's inventory.
+		if (!player.inventory[this.type]) {
+			player.inventory[this.type] = this.value;
+		} else {
+			player.inventory[this.type] += this.value;
+		}
+
+		// Destroy this item.
+		this.destroy();
+	}
+
+	logic() {
+		// Tick the item's expiration downward and destroy if necessary.
+		this.expire--;
+		this.expire <= 0 && this.destroy();
+	}
+
+	// Render this item.
+	render(ctx) {
+		try {
+			ctx.beginPath();
+
+			ctx.drawImage(
+				tiles.map, // The tilemap image.
+				tiles.itemIndeces[this.type] !== undefined
+					? tiles.itemIndeces[this.type]
+					: 0, // The x and y sub-coordinates to grab the tile's texture from the image.
+				0,
+				4, // The 4x4 pixel dimensions of that sub-image.
+				4,
+				this.x - player.camera.x, // Proper placement of the tile on screen.
+				this.y - player.camera.y,
+				4, // The size of the tile, as drawn on screen.
+				4
+			);
+
+			ctx.closePath();
+		} catch {
+			return;
+		}
+	}
+}
+
+// Item manager.
+class ItemManager {
+	constructor() {
+		this.items = [];
+
+		this.itemIndeces = {
+			coin: 0,
+		};
+
+		this.map = undefined;
+		this.load_tilemap();
+	}
+
+	// Add an item to the game.
+	createItem(x, y, type, value) {
+		let item = new Item(x, y, type, value);
+
+		this.items.push(item);
+
+		return item;
+	}
+
+	// Load the image source for the tilemap. Should be done before any rendering is attempted. But the rendering is given a try catch since JS is asynchronous.
+	load_tilemap = () => {
+		let img = new Image();
+		img.onload = () => {
+			this.map = img;
+		};
+		img.src = "./data/images/tilemap_items.png";
+	};
+
+	logic() {
+		// Run game logic for all items.
+		for (let item of this.items) {
+			item.logic();
+		}
+	}
+
+	render(ctx) {
+		// Render all items.
+		for (let item of this.items) {
+			item.render(ctx);
+		}
+	}
+}
+const items = new ItemManager();
+items.createItem(0, 0, "coin", 1);
+
 // Map.
 const tiles = {
 	map: undefined,
@@ -456,14 +581,14 @@ tiles.load();
 // Room templates
 const rooms = {
 	dev_room: [
-		[8, 13, 13, 13, 13, 13, 13, 9],
+		[8, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 9],
 		[12, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 12],
 		[12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12],
 		[12, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 12],
 		[12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12],
 		[12, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 12],
 		[12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12],
-		[11, 13, 13, 13, 13, 13, 13, 10],
+		[11, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 10],
 	],
 };
 

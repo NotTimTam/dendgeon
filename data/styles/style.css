@@ -14,14 +14,24 @@ html {
 }
 
 body {
-	background-color: #141414;
+	background: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)),
+		url("../images/bg.png");
+	background-size: 64px 64px;
 }
 
 canvas {
+	background: black;
+	border-radius: 1em;
+	border: 3px solid #7c1934;
+
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+
+	transition-property: width height;
+	transition-duration: 1s;
+	transition-timing-function: ease-in-out;
 
 	image-rendering: -moz-crisp-edges;
 	image-rendering: -webkit-crisp-edges;
@@ -31,5 +41,5 @@ canvas {
 	width: 50vw;
 	height: 50vw;
 
-	border: 1px solid #292929;
+	/* border: 1px solid #292929; */
 }
