@@ -19,10 +19,15 @@ body {
 	background-size: 64px 64px;
 }
 
+h1 {
+	text-align: center;
+	color: white;
+}
+
 canvas {
 	background: black;
-	border-radius: 1em;
-	border: 3px solid #7c1934;
+	border-radius: 20px;
+	border: 5px solid #7c1934;
 
 	position: absolute;
 	top: 50%;
