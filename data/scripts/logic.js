@@ -128,6 +128,7 @@ class Player {
 			lastY: 0,
 			velocity: 0,
 		};
+		this.dir = 0;
 
 		// Max movement speed.
 		this.speed = 2;
@@ -141,8 +142,10 @@ class Player {
 
 		// Camera positioning.
 		this.camera = {
-			x: 0,
+			x: 0, // The camera's current position.
 			y: 0,
+			desX: 0, // The position the camera is smoothly moving towards.
+			desY: 0,
 		};
 
 		// Player inventory.
@@ -350,8 +353,28 @@ class Player {
 
 		this.tilePos = worldToTile(this.x, this.y);
 
-		this.camera.x = Math.round(this.x - 60);
-		this.camera.y = Math.round(this.y - 60);
+		// Set where the camera should be.
+		this.camera.desX = Math.round(this.x + 4 - canvas.width / 2);
+		this.camera.desY = Math.round(this.y + 4 - canvas.height / 2);
+
+		let smoothspeed = 6;
+
+		// Smooth camera movement.
+		let newCamPos = cartesian2(
+			angle({ x: this.camera.desX, y: this.camera.desY }, this.camera),
+			distance(
+				this.camera.x,
+				this.camera.y,
+				this.camera.desX,
+				this.camera.desY
+			) / smoothspeed
+		);
+
+		this.camera.x += newCamPos.x;
+		this.camera.y += newCamPos.y;
+
+		this.camera.x = Math.round(this.camera.x);
+		this.camera.y = Math.round(this.camera.y);
 
 		this.animate();
 	}
