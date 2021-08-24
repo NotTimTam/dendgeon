@@ -339,6 +339,13 @@ class Player {
 			this.dir = 3;
 		}
 
+		// Sprinting.
+		if (keyboard.Shift) {
+			this.speed = 2;
+		} else {
+			this.speed = 1;
+		}
+
 		// Calculate the player's velocity.
 		this.physics.velocity = vector2(
 			Math.abs(this.x - this.physics.lastX),
