@@ -206,10 +206,10 @@ class Player {
 	checkCol(dir) {
 		// The hypothetical bounding box, or where the player would be if the movement was applied.
 		let hbb = {
-			x: this.x,
-			y: this.y,
-			width: 8,
-			height: 8,
+			x: this.x + 1,
+			y: this.y + 1,
+			width: 7,
+			height: 7,
 		};
 
 		// The tile position in the world the player would be in if we moved.
@@ -509,14 +509,15 @@ class ItemManager {
 		this.map = undefined;
 		this.load_tilemap();
 
-		for (let i = 0; i < 100; i++) {
-			this.createItem(
-				8 + Math.random() * 93,
-				8 + Math.random() * 45,
-				"coin",
-				Math.ceil(Math.random() * 8)
-			);
-		}
+		// Debugging: creates lots of coins.
+		// for (let i = 0; i < 100; i++) {
+		// 	this.createItem(
+		// 		8 + Math.random() * 93,
+		// 		8 + Math.random() * 45,
+		// 		"coin",
+		// 		Math.ceil(Math.random() * 8)
+		// 	);
+		// }
 	}
 
 	// Load the image source for the tilemap. Should be done before any rendering is attempted. But the rendering is given a try catch since JS is asynchronous.
@@ -604,7 +605,7 @@ const tiles = {
 	},
 
 	// WALLS
-	wall_center: {
+	wall: {
 		solid: true,
 
 		pos: {
@@ -614,7 +615,7 @@ const tiles = {
 
 		id: 3,
 	},
-	wall_left: {
+	wall_ledge: {
 		solid: true,
 
 		pos: {
@@ -624,8 +625,8 @@ const tiles = {
 
 		id: 4,
 	},
-	wall_right: {
-		solid: true,
+	wall_back: {
+		solid: false,
 
 		pos: {
 			x: 2,
@@ -634,85 +635,29 @@ const tiles = {
 
 		id: 5,
 	},
-	wall_up: {
+
+	door_closed: {
 		solid: true,
 
-		pos: {
-			x: 3,
-			y: 1,
-		},
+		pos: { x: 2, y: 0 },
 
 		id: 6,
 	},
-	wall_down: {
-		solid: true,
 
-		pos: {
-			x: 4,
-			y: 1,
-		},
+	door_closed_backwall: {
+		solid: false,
+
+		pos: { x: 2, y: 0 },
+
+		id: 6.5,
+	},
+
+	door_open: {
+		solid: false,
+
+		pos: { x: 3, y: 0 },
 
 		id: 7,
-	},
-	wall_top_left: {
-		solid: true,
-
-		pos: {
-			x: 5,
-			y: 1,
-		},
-
-		id: 8,
-	},
-	wall_top_right: {
-		solid: true,
-
-		pos: {
-			x: 6,
-			y: 1,
-		},
-
-		id: 9,
-	},
-	wall_bottom_right: {
-		solid: true,
-
-		pos: {
-			x: 7,
-			y: 1,
-		},
-
-		id: 10,
-	},
-	wall_bottom_left: {
-		solid: true,
-
-		pos: {
-			x: 8,
-			y: 1,
-		},
-
-		id: 11,
-	},
-	wall_column: {
-		solid: true,
-
-		pos: {
-			x: 9,
-			y: 1,
-		},
-
-		id: 12,
-	},
-	wall_row: {
-		solid: true,
-
-		pos: {
-			x: 10,
-			y: 1,
-		},
-
-		id: 13,
 	},
 };
 // Load the tilemap texture image if it hasn't been already.
@@ -720,15 +665,13 @@ tiles.load();
 
 // Room templates
 const rooms = {
-	dev_room: [
-		[8, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 9],
-		[12, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 12],
-		[12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12],
-		[12, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 12],
-		[12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12],
-		[12, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 12],
-		[12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12],
-		[11, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 10],
+	spawn: [
+		[3, 4, 4, 4, 3],
+		[3, 5, 6.5, 5, 3],
+		[3, 1, 1, 1, 3],
+		[6, 1, 1, 1, 6],
+		[3, 1, 1, 1, 3],
+		[3, 3, 6, 3, 3],
 	],
 };
 
@@ -799,6 +742,85 @@ class Tile {
 	}
 }
 
+class Door extends Tile {
+	constructor(x, y, type) {
+		super(x, y, type);
+
+		this.open = false;
+		this.locked = false;
+	}
+
+	// Check wether or not this tile is currently on-screen.
+	onScreen() {
+		// Check x's.
+		if (this.x + 8 < player.camera.x) {
+			return false;
+		} else if (this.x > player.camera.x + canvas.width) {
+			return false;
+		}
+
+		// Check y's.
+		if (this.y + 8 < player.camera.y) {
+			return false;
+		} else if (this.y > player.camera.y + canvas.height) {
+			return false;
+		}
+
+		// Otherwise return "true". (i.e. it is on screen)
+		return true;
+	}
+
+	logic() {}
+
+	render(ctx) {
+		// If the tile is not on-screen, we don't render it.
+		if (!this.onScreen()) {
+			return;
+		}
+
+		try {
+			ctx.beginPath();
+
+			ctx.drawImage(
+				tiles.map, // The tilemap image.
+				this.data.pos.x * 8, // The x and y sub-coordinates to grab the tile's texture from the image.
+				this.data.pos.y * 8,
+				8, // The 8x8 pixel dimensions of that sub-image.
+				8,
+				this.x - player.camera.x, // Proper placement of the tile on screen.
+				this.y - player.camera.y,
+				8, // The size of the tile, as drawn on screen.
+				8
+			);
+
+			ctx.closePath();
+
+			// If we are close enough to the player, and we aren't open, then we get highlighted.
+			if (
+				distance(this.x + 4, this.y + 4, player.x + 4, player.y + 4) <=
+					9 &&
+				!this.open
+			) {
+				ctx.beginPath();
+				ctx.strokeStyle = "yellow";
+				ctx.lineWidth = 1;
+
+				ctx.rect(
+					Math.round(this.x - player.camera.x),
+					Math.round(this.y - player.camera.y),
+					8,
+					8
+				);
+
+				ctx.stroke();
+				ctx.closePath();
+			}
+		} catch {
+			return;
+		}
+	}
+}
+
 // A room, contains tiles and events as well as handeling of loot and enemies.
 class Room {
 	constructor(x, y) {
@@ -846,11 +868,21 @@ class Room {
 
 	// Create a tile.
 	createTile(x, y, type) {
-		let tile = new Tile(x, y, type);
-		this.tiles.push(tile);
-		world.globalTiles.push(tile);
+		if (type !== "door_closed" && type !== "door_closed_backwall") {
+			// If it is a regular tile.
+			let tile = new Tile(x, y, type);
+			this.tiles.push(tile);
+			world.globalTiles.push(tile);
 
-		return tile;
+			return tile;
+		} else {
+			// If the tile is a door.
+			let door = new Door(x, y, type);
+			this.tiles.push(door);
+			world.globalTiles.push(door);
+
+			return door;
+		}
 	}
 
 	// Destroy a tile.
@@ -882,17 +914,6 @@ class Room {
 			tile.render(ctx);
 		}
 	}
-}
-
-// A room that connects two other rooms.
-class Hallway extends Room {
-	constructor(x, y) {
-		super(x, y);
-	}
-
-	logic() {}
-
-	render(ctx) {}
 }
 
 // The world, or level, which holds all rooms and major game logic.
@@ -948,4 +969,6 @@ class World {
 
 // Gamestate.
 let world = new World();
-world.createRoomFromData(0, 0, "dev_room");
+
+// Create a spawn area.
+world.createRoomFromData(0, 0, "spawn");
