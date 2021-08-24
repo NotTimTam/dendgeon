@@ -82,14 +82,12 @@ function renderLoop() {
 	// LOGIC.
 	world.logic(); // Update the world.
 	items.logic(); // Update the items.
-	projectiles.logic(); // Update all the projectiles.
 	player.logic(); // Update the player.
 
 	// RENDER.
 	clearCanvas();
 	world.render(ctx); // Render the world, all of its rooms and tiles.
 	items.render(ctx); // Render all the items in the game.
-	projectiles.render(ctx); // Render all the projectiles in the game.
 	player.render(ctx); // Render the player.
 
 	player.renderUI(ctx); // Render the player's UI.
