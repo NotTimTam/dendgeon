@@ -128,7 +128,11 @@ class Player {
 			lastY: 0,
 			velocity: 0,
 		};
-		this.dir = 0;
+		this.dir = 3;
+
+		// Projectiles.
+		this.projectileTick = 0;
+		this.projectileDelay = 20;
 
 		// Max movement speed.
 		this.speed = 2;
@@ -316,23 +320,40 @@ class Player {
 			if (!this.checkCol(0)) {
 				this.y -= this.speed;
 			}
+			this.dir = 0;
 		}
 		if (keyboard.ArrowRight || keyboard.d) {
 			if (!this.checkCol(1)) {
 				this.x += this.speed;
 				this.animation.direction = 1; // Set the player's animation direction.
 			}
+			this.dir = 1;
 		}
 		if (keyboard.ArrowDown || keyboard.s) {
 			if (!this.checkCol(2)) {
 				this.y += this.speed;
 			}
+			this.dir = 2;
 		}
 		if (keyboard.ArrowLeft || keyboard.a) {
 			if (!this.checkCol(3)) {
 				this.x -= this.speed;
 				this.animation.direction = -1; // Set the player's animation direction.
 			}
+			this.dir = 3;
+		}
+
+		// Use sword.
+		if ((keyboard.z || keyboard.k) && this.projectileTick <= 0) {
+			projectiles.createProjectile(
+				this.x,
+				this.y,
+				this.dir,
+				"sword",
+				this
+			);
+
+			this.projectileTick = this.projectileDelay;
 		}
 
 		// Calculate the player's velocity.
@@ -377,6 +398,9 @@ class Player {
 		this.camera.y = Math.round(this.camera.y);
 
 		this.animate();
+
+		// Projectiles.
+		this.projectileTick--;
 	}
 
 	render(ctx) {
@@ -404,6 +428,106 @@ class Player {
 }
 
 const player = new Player(16, 16);
+
+// Projectiles.
+class Projectile {
+	constructor(x, y, dir, type, source = undefined) {
+		this.x = x;
+		this.y = y;
+		this.dir = dir;
+
+		this.type = type;
+		this.speed = 1;
+		this.timeout = 999;
+
+		if (this.type === "sword") {
+			this.speed = 1.5;
+			this.timeout = 10;
+		}
+	}
+
+	logic() {
+		this.timeout--;
+		this.timeout <= 0 && projectiles.destroyProjectile(this);
+
+		switch (this.dir) {
+			case 0:
+				this.y -= this.speed;
+				break;
+			case 1:
+				this.x += this.speed;
+				break;
+			case 2:
+				this.y += this.speed;
+				break;
+			case 3:
+				this.x -= this.speed;
+				break;
+			default:
+				break;
+		}
+	}
+
+	render(ctx) {
+		try {
+			ctx.beginPath();
+
+			ctx.drawImage(
+				projectiles.sheet.map, // The tilemap image.
+				projectiles.sheet.locs[`${this.type}_${this.dir}`].x * 8, // The x and y sub-coordinates to grab the tile's texture from the image.
+				projectiles.sheet.locs[`${this.type}_${this.dir}`].y * 8,
+				8, // The 8x8 pixel dimensions of that sub-image.
+				8,
+				this.x - player.camera.x, // Proper placement of the tile on screen.
+				this.y - player.camera.y,
+				8, // The size of the tile, as drawn on screen.
+				8
+			);
+
+			ctx.closePath();
+		} catch {}
+	}
+}
+
+class ProjectileManager {
+	constructor() {
+		this.projectiles = [];
+
+		this.sheet = new Sheet("spritesheet_projectiles", {
+			sword_0: { x: 1, y: 0 }, // up
+			sword_1: { x: 0, y: 0 }, // right
+			sword_2: { x: 3, y: 0 }, // down
+			sword_3: { x: 2, y: 0 }, // left
+		});
+	}
+
+	createProjectile(x, y, dir, type, source) {
+		let projectile = new Projectile(x, y, dir, type, source);
+
+		this.projectiles.push(projectile);
+
+		return projectile;
+	}
+
+	destroyProjectile(projectile) {
+		this.projectiles.splice(this.projectiles.indexOf(projectile), 1);
+	}
+
+	logic() {
+		// Update all projectiles
+		for (let projectile of this.projectiles) {
+			projectile.logic();
+		}
+	}
+
+	render(ctx) {
+		// Render all projectiles
+		for (let projectile of this.projectiles) {
+			projectile.render(ctx);
+		}
+	}
+}
+let projectiles = new ProjectileManager();
 
 // Items.
 class Item {
