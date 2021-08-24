@@ -339,19 +339,6 @@ class Player {
 			this.dir = 3;
 		}
 
-		// Use sword.
-		if ((keyboard.z || keyboard.k) && this.projectileTick <= 0) {
-			projectiles.createProjectile(
-				this.x,
-				this.y,
-				this.dir,
-				"sword",
-				this
-			);
-
-			this.projectileTick = this.projectileDelay;
-		}
-
 		// Calculate the player's velocity.
 		this.physics.velocity = vector2(
 			Math.abs(this.x - this.physics.lastX),
