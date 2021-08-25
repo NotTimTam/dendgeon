@@ -206,8 +206,8 @@ class Player {
 	checkCol(dir) {
 		// The hypothetical bounding box, or where the player would be if the movement was applied.
 		let hbb = {
-			x: this.x + 1,
-			y: this.y + 1,
+			x: this.x,
+			y: this.y,
 			width: 7,
 			height: 7,
 		};
@@ -244,10 +244,41 @@ class Player {
 		);
 
 		// Check for collisions and return the outcome.
-		if (this.goalTile === undefined) {
-			return false;
-		} else if (AABB(hbb, this.goalTile) && this.goalTile.data.solid) {
+		if (
+			this.goalTile !== undefined &&
+			AABB(
+				{
+					x: hbb.x + 1,
+					y: hbb.y + 1,
+					width: hbb.width,
+					height: hbb.height,
+				},
+				this.goalTile
+			) &&
+			this.goalTile.data.solid
+		) {
 			return true;
+		}
+
+		for (let tile of world.globalTiles) {
+			if (distance(tile.x, tile.y, hbb.x, hbb.y) <= 16) {
+				if (
+					AABB(
+						{
+							x: hbb.x + 1,
+							y: hbb.y + 1,
+							width: hbb.width,
+							height: hbb.height,
+						},
+						tile
+					) &&
+					tile.data.solid
+				) {
+					return true;
+				}
+			} else {
+				continue;
+			}
 		}
 
 		return false;
@@ -632,16 +663,6 @@ const tiles = {
 
 		id: 4,
 	},
-	wall_back: {
-		solid: false,
-
-		pos: {
-			x: 2,
-			y: 1,
-		},
-
-		id: 5,
-	},
 
 	door_closed: {
 		solid: true,
@@ -649,14 +670,6 @@ const tiles = {
 		pos: { x: 2, y: 0 },
 
 		id: 6,
-	},
-
-	door_closed_backwall: {
-		solid: false,
-
-		pos: { x: 2, y: 0 },
-
-		id: 6.5,
 	},
 
 	door_open: {
@@ -673,12 +686,27 @@ tiles.load();
 // Room templates
 const rooms = {
 	spawn: [
-		[3, 4, 4, 4, 3],
-		[3, 5, 6.5, 5, 3],
+		[3, 4, 6, 4, 3],
 		[3, 1, 1, 1, 3],
 		[6, 1, 1, 1, 6],
 		[3, 1, 1, 1, 3],
 		[3, 3, 6, 3, 3],
+	],
+
+	hallway_down: [
+		[3, 1, 1, 1, 3],
+		[3, 1, 1, 1, 3],
+		[3, 1, 1, 1, 3],
+		[3, 1, 1, 1, 3],
+		[3, 1, 1, 1, 3],
+		[3, 1, 1, 1, 3],
+		[3, 1, 1, 1, 3],
+		[3, 1, 1, 1, 3],
+		[3, 1, 1, 1, 3],
+		[3, 1, 1, 1, 3],
+		[3, 1, 1, 1, 3],
+		[3, 1, 1, 1, 3],
+		[3, 1, 1, 1, 3],
 	],
 };
 
@@ -750,9 +778,16 @@ class Tile {
 }
 
 class Door extends Tile {
-	constructor(x, y, type) {
+	constructor(x, y, type, exits) {
 		super(x, y, type);
 
+		// The room the door exits from.
+		this.exits = exits;
+
+		// Wether the door has generated a new room yet.
+		this.hasGenerated = false;
+
+		// The status of the door.
 		this.open = false;
 		this.locked = false;
 	}
@@ -777,7 +812,27 @@ class Door extends Tile {
 		return true;
 	}
 
-	logic() {}
+	logic() {
+		// Determine if the door should be open or closed.
+		if (this.open) {
+			this.data = tiles.door_open;
+		} else {
+			this.data = tiles[this.type];
+		}
+
+		// Open the door with Z.
+		let dt = distance(this.x + 4, this.y + 4, player.x + 4, player.y + 4); // The distance between the door and the player.
+
+		// If the door is unlocked, but not open, we open it.
+		if (
+			dt <= 9 &&
+			!this.open &&
+			!this.locked &&
+			(keyboard.z || keyboard.k)
+		) {
+			this.open = true;
+		}
+	}
 
 	render(ctx) {
 		// If the tile is not on-screen, we don't render it.
@@ -875,16 +930,16 @@ class Room {
 
 	// Create a tile.
 	createTile(x, y, type) {
-		if (type !== "door_closed" && type !== "door_closed_backwall") {
+		if (type !== "door_closed" && type !== "door_open") {
 			// If it is a regular tile.
-			let tile = new Tile(x, y, type);
+			let tile = new Tile(x + this.x, y + this.y, type);
 			this.tiles.push(tile);
 			world.globalTiles.push(tile);
 
 			return tile;
 		} else {
 			// If the tile is a door.
-			let door = new Door(x, y, type);
+			let door = new Door(x + this.x, y + this.y, type, this);
 			this.tiles.push(door);
 			world.globalTiles.push(door);
 
@@ -898,7 +953,12 @@ class Room {
 		world.globalTiles.splice(world.globalTiles.indexOf(tile), 1);
 	}
 
-	logic() {}
+	logic() {
+		// Update all tiles.
+		for (let tile of this.tiles) {
+			tile.logic();
+		}
+	}
 
 	render(ctx) {
 		// Render a placeholder if there are no tiles. ---------------------------- DELETE AFTER DEBUGGING
@@ -964,7 +1024,12 @@ class World {
 		return undefined;
 	}
 
-	logic() {}
+	logic() {
+		// Update all rooms.
+		for (let room of this.rooms) {
+			room.logic();
+		}
+	}
 
 	render(ctx) {
 		// Render all rooms.
