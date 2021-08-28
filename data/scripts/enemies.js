@@ -48,8 +48,12 @@ class Enemy {
 		this.dir = 3;
 
 		// Max movement speed.
-		this.speed = 0.5;
+		this.speed = 1;
 		this.speed > 8 ? (this.speed = 8) : "";
+
+		// The position around the player to move to.
+		this.angleToPlayer = randInt(0, 360);
+		this.distanceToPlayer = randInt(10, 2);
 
 		// enemy stats.
 		this.health = health;
@@ -160,40 +164,44 @@ class Enemy {
 		this.physics.lastX = this.x;
 		this.physics.lastY = this.y;
 
-		// Check for collisions in the direction of travel and then apply the travel if there are none.
-		if (distance(this.x + 4, this.y + 4, player.x + 4, player.y + 4) > 10) {
-			if (player.y < this.y) {
-				if (!this.checkCol(0)) {
-					this.y -= this.speed;
-				}
-				this.dir = 0;
-			}
-			if (player.x > this.x) {
-				if (!this.checkCol(1)) {
-					this.x += this.speed;
-					this.animation.direction = 1; // Set the player's animation direction.
-				}
-				this.dir = 1;
-			}
-			if (player.y > this.y) {
-				if (!this.checkCol(2)) {
-					this.y += this.speed;
-				}
-				this.dir = 2;
-			}
-			if (player.x < this.x) {
-				if (!this.checkCol(3)) {
-					this.x -= this.speed;
-					this.animation.direction = -1; // Set the player's animation direction.
-				}
-				this.dir = 3;
-			}
-		}
+		let targetPos = cartesian2(this.angleToPlayer, 0);
 
-		// Move around other enemies.
-		if (this.checkColWithEnemies() !== false) {
-			let enemy = this.checkColWithEnemies();
+		// Check for collisions in the direction of travel and then apply the travel if there are none.
+		// if (
+		// 	distance(
+		// 		this.x + 4,
+		// 		this.y + 4,
+		// 		player.x + 4 + targetPos.x,
+		// 		player.y + 4 + targetPos.y
+		// 	) > 10
+		// ) {
+		if (player.y + 4 + targetPos.y < this.y) {
+			if (!this.checkCol(0)) {
+				this.y -= this.speed;
+			}
+			this.dir = 0;
 		}
+		if (player.x + 4 + targetPos.x > this.x) {
+			if (!this.checkCol(1)) {
+				this.x += this.speed;
+				this.animation.direction = 1; // Set the player's animation direction.
+			}
+			this.dir = 1;
+		}
+		if (player.y + 4 + targetPos.y > this.y) {
+			if (!this.checkCol(2)) {
+				this.y += this.speed;
+			}
+			this.dir = 2;
+		}
+		if (player.x + 4 + targetPos.x < this.x) {
+			if (!this.checkCol(3)) {
+				this.x -= this.speed;
+				this.animation.direction = -1; // Set the player's animation direction.
+			}
+			this.dir = 3;
+		}
+		//}
 
 		// Check the enemy's health.
 		if (this.health <= 0) {
