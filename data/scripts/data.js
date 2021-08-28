@@ -1,6 +1,92 @@
 "use strict";
 
-// Room templates
+// Tiles.
+const tiles = {
+	map: undefined,
+	tileSize: 8,
+
+	load: () => {
+		let img = new Image();
+		img.onload = () => {
+			tiles.map = img;
+		};
+		img.src = "./data/images/tilemap.png";
+	},
+
+	err: {
+		solid: false,
+
+		pos: {
+			x: 0,
+			y: 2,
+		},
+
+		id: 0,
+	},
+
+	ground_1: {
+		solid: false,
+
+		pos: {
+			x: 0,
+			y: 0,
+		},
+
+		id: 1,
+	},
+	ground_2: {
+		solid: false,
+
+		pos: {
+			x: 0,
+			y: 0,
+		},
+
+		id: 2,
+	},
+
+	// WALLS
+	wall: {
+		solid: true,
+
+		pos: {
+			x: 0,
+			y: 1,
+		},
+
+		id: 3,
+	},
+	wall_ledge: {
+		solid: true,
+
+		pos: {
+			x: 1,
+			y: 1,
+		},
+
+		id: 4,
+	},
+
+	door_closed: {
+		solid: true,
+
+		pos: { x: 2, y: 0 },
+
+		id: 6,
+	},
+
+	door_open: {
+		solid: false,
+
+		pos: { x: 3, y: 0 },
+
+		id: 7,
+	},
+};
+// Load the tilemap texture image if it hasn't been already.
+tiles.load();
+
+// Room templates.
 const rooms = {
 	a: [
 		[3, 4, 4, 4, 4, 6, 4, 4, 4, 4, 3],
