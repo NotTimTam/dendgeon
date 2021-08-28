@@ -7,6 +7,12 @@ const worldToTile = (x, y) => {
 		y: Math.round(y / 8 - 0.5),
 	};
 };
+const worldToRoom = (x, y) => {
+	return {
+		x: Math.round(x / 88 - 0.5) * 88,
+		y: Math.round(y / 88 - 0.5) * 88,
+	};
+};
 
 const AABB = (rect1, rect2) => {
 	if (
@@ -134,12 +140,18 @@ class Player {
 		};
 		this.dir = 3;
 
+		// Light.
+		this.lightStrength = 15;
+
 		// Max movement speed.
 		this.speed = 2;
 		this.speed > 8 ? (this.speed = 8) : "";
 
 		// What tile the player is mostly standing on.
 		this.tilePos = {};
+
+		// The room the player is in.
+		this.roomPos = {};
 
 		// The tile the player is moving towards.
 		this.goalTile = {};
@@ -379,6 +391,7 @@ class Player {
 		this.y = Math.round(this.y);
 
 		this.tilePos = worldToTile(this.x, this.y);
+		this.roomPos = worldToRoom(this.x, this.y);
 
 		// Set where the camera should be.
 		this.camera.desX = Math.round(this.x + 4 - canvas.width / 2);
@@ -628,6 +641,11 @@ class Tile {
 		}
 
 		try {
+			ctx.save();
+			ctx.globalAlpha =
+				player.lightStrength /
+				distance(this.x, this.y, player.x, player.y);
+
 			ctx.beginPath();
 
 			ctx.drawImage(
@@ -643,6 +661,7 @@ class Tile {
 			);
 
 			ctx.closePath();
+			ctx.restore();
 		} catch {
 			return;
 		}
@@ -865,6 +884,11 @@ class Door extends Tile {
 		}
 
 		try {
+			ctx.save();
+			ctx.globalAlpha =
+				player.lightStrength /
+				distance(this.x, this.y, player.x, player.y);
+
 			ctx.beginPath();
 
 			ctx.drawImage(
@@ -901,6 +925,7 @@ class Door extends Tile {
 				ctx.stroke();
 				ctx.closePath();
 			}
+			ctx.restore();
 		} catch {
 			return;
 		}
