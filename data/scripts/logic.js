@@ -65,6 +65,24 @@ const cartesian2 = (angle, velocity) => {
 	};
 };
 
+const randomGroundTile = () => {
+	let randy = randInt(0, 10);
+
+	let retVal;
+
+	if (randy === 0) {
+		retVal = 1;
+	} else if (randy === 1) {
+		retVal = 2;
+	} else if (randy > 1 && randy < 6) {
+		retVal = 4;
+	} else {
+		retVal = 3;
+	}
+
+	return `ground_${retVal}`;
+};
+
 // Global Objects.
 
 // Tilemaps and Spritesheets.
@@ -960,12 +978,9 @@ class Room {
 		let roomChance = Math.random() * 100; // Room chances span from 0-100.
 		if (roomChance < 50) {
 			this.type = "hostile";
-		} else if (roomChance >= 50 && roomChance < 75) {
+		} else if (roomChance >= 50) {
 			this.type = "coins";
-		} else {
-			this.type = "ambient";
 		}
-
 		// Determine the room data statuses.
 		this.cleared = false; // Whether or not the player has cleared the room.
 		this.active = false; // Whether or not the room activily needs to be cleared.
@@ -1070,7 +1085,7 @@ class Room {
 				this.createTile(
 					door.x - this.x,
 					door.y - this.y,
-					["ground_1", "ground_2"][Math.floor(Math.random() * 2)],
+					randomGroundTile(),
 					false
 				);
 			}
@@ -1099,7 +1114,7 @@ class Room {
 
 				for (let x = 0; x < width; x++) {
 					if (x !== 0 && x !== width - 1) {
-						xRow.push(1);
+						xRow.push(randInt(1, 2));
 					} else {
 						xRow.push(3);
 					} // Add floor tiles if we are not on the edge.
@@ -1164,6 +1179,11 @@ class Room {
 
 						break;
 					}
+				}
+
+				// Randomize ground tiles.
+				if (searchedTile === "ground_1") {
+					searchedTile = randomGroundTile();
 				}
 
 				// At this point, searchedTile is the key for the tiledata we want.
@@ -1308,7 +1328,7 @@ class World {
 				spawn.createTile(
 					tile.x - spawn.x,
 					tile.y - spawn.y,
-					["ground_1", "ground_2"][Math.floor(Math.random() * 2)],
+					randomGroundTile(),
 					false
 				);
 			}

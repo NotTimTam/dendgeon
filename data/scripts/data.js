@@ -38,11 +38,31 @@ const tiles = {
 		solid: false,
 
 		pos: {
-			x: 0,
+			x: 1,
 			y: 0,
 		},
 
 		id: 2,
+	},
+	ground_3: {
+		solid: false,
+
+		pos: {
+			x: 2,
+			y: 0,
+		},
+
+		id: 9,
+	},
+	ground_4: {
+		solid: false,
+
+		pos: {
+			x: 3,
+			y: 0,
+		},
+
+		id: 8,
 	},
 
 	// WALLS
@@ -70,7 +90,7 @@ const tiles = {
 	door_closed: {
 		solid: true,
 
-		pos: { x: 2, y: 0 },
+		pos: { x: 2, y: 1 },
 
 		id: 6,
 	},
@@ -78,7 +98,7 @@ const tiles = {
 	door_open: {
 		solid: false,
 
-		pos: { x: 3, y: 0 },
+		pos: { x: 3, y: 1 },
 
 		id: 7,
 	},
