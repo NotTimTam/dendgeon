@@ -76,21 +76,38 @@ function renderNumber(x, y, number) {
 
 // Render loop.
 function renderLoop() {
-	// INPUT.
-	player.input();
+	// If the world hasn't finished generating, we don't render.
+	if (!world.finishedGenerating) {
+		ctx.beginPath();
 
-	// LOGIC.
-	world.logic(); // Update the world.
-	items.logic(); // Update the items.
-	player.logic(); // Update the player.
+		ctx.font = "bold 12px consolas";
+		ctx.textAlign = "center";
+		ctx.textBaseline = "middle";
+		ctx.fillStyle = "white";
+		ctx.fillText(
+			"LOADING",
+			Math.round(canvas.width / 2),
+			Math.round(canvas.height / 2)
+		);
 
-	// RENDER.
-	clearCanvas();
-	world.render(ctx); // Render the world, all of its rooms and tiles.
-	items.render(ctx); // Render all the items in the game.
-	player.render(ctx); // Render the player.
+		ctx.closePath();
+	} else {
+		// INPUT.
+		player.input();
 
-	player.renderUI(ctx); // Render the player's UI.
+		// LOGIC.
+		world.logic(); // Update the world.
+		items.logic(); // Update the items.
+		player.logic(); // Update the player.
+
+		// RENDER.
+		clearCanvas();
+		world.render(ctx); // Render the world, all of its rooms and tiles.
+		items.render(ctx); // Render all the items in the game.
+		player.render(ctx); // Render the player.
+
+		player.renderUI(ctx); // Render the player's UI.
+	}
 
 	window.requestAnimationFrame(renderLoop);
 }

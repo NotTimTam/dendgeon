@@ -673,7 +673,7 @@ class Door extends Tile {
 			let self = this;
 			window.setTimeout(() => {
 				self.generateNextRoom();
-			}, 25);
+			}, 1);
 		}
 		this.hasGenerated = false;
 
@@ -1103,6 +1103,7 @@ class World {
 
 		// The maximum amount of rooms in the world.
 		this.roomCount = 100;
+		this.finishedGenerating = false; // If the world has finished generating.
 	}
 
 	// Clean up the world after it has been generated.
@@ -1152,6 +1153,22 @@ class World {
 				);
 			}
 		}
+
+		// Remove all the doors from the spawnpoint.
+		spawn.tiles.forEach((tile) => {
+			if (tile.type === "door_closed" || tile.type === "door_open") {
+				spawn.destroyTile(tile);
+				spawn.createTile(
+					tile.x - spawn.x,
+					tile.y - spawn.y,
+					["ground_1", "ground_2"][Math.floor(Math.random() * 2)],
+					false
+				);
+			}
+		});
+
+		// Set that the game has finished loading the world to true.
+		this.finishedGenerating = true;
 	}
 
 	// Get a room by its position.
@@ -1167,10 +1184,12 @@ class World {
 		// If strict mode is on, and there is a collision with another room, we do not create the room.
 		let room = new Room(x, y, true, null);
 
-		// Loop through all rooms and check for collision.
-		for (let checkedRoom of this.rooms) {
-			if (AABB(room, checkedRoom) && strict) {
-				return "Could not create room. It intersects another room.";
+		// Loop through all rooms and check for collision if we are in strict mode.
+		if (strict) {
+			for (let checkedRoom of this.rooms) {
+				if (AABB(room, checkedRoom)) {
+					return "Could not create room. It intersects another room.";
+				}
 			}
 		}
 
@@ -1198,10 +1217,12 @@ class World {
 		// If strict mode is on, and there is a collision with another room, we do not create the room.
 		let room = new Room(x, y, false, roomName, roomsDoorsCanGenerateRooms);
 
-		// Loop through all rooms and check for collision.
-		for (let checkedRoom of this.rooms) {
-			if (AABB(room, checkedRoom) && strict) {
-				return "Could not create room. It intersects another room.";
+		// Loop through all rooms and check for collision if we are in strict mode.
+		if (strict) {
+			for (let checkedRoom of this.rooms) {
+				if (AABB(room, checkedRoom)) {
+					return "Could not create room. It intersects another room.";
+				}
 			}
 		}
 
@@ -1250,7 +1271,7 @@ class World {
 let world = new World();
 
 // Create a spawn area.
-world.createRoomFromData(
+let spawn = world.createRoomFromData(
 	0,
 	0,
 	// ["a", "u", "d", "l", "r", "ul", "ur", "dl", "dr"][
@@ -1258,4 +1279,5 @@ world.createRoomFromData(
 	// ]
 	"a"
 );
+
 // world.createRoom(0, 0);
