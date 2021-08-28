@@ -430,7 +430,7 @@ class Player {
 	}
 }
 
-const player = new Player(16, 16);
+const player = new Player(8 * 5, 8 * 5);
 
 // Items.
 class Item {
@@ -670,29 +670,194 @@ tiles.load();
 
 // Room templates
 const rooms = {
-	spawn: [
-		[3, 4, 6, 4, 3],
-		[3, 1, 1, 1, 3],
-		[6, 1, 1, 1, 6],
-		[3, 1, 1, 1, 3],
-		[3, 3, 6, 3, 3],
+	a: [
+		[3, 4, 4, 4, 4, 6, 4, 4, 4, 4, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 3, 3, 3, 3, 6, 3, 3, 3, 3, 3],
 	],
 
-	hallway_down: [
-		[3, 1, 1, 1, 3],
-		[3, 1, 1, 1, 3],
-		[3, 1, 1, 1, 3],
-		[3, 1, 1, 1, 3],
-		[3, 1, 1, 1, 3],
-		[3, 1, 1, 1, 3],
-		[3, 1, 1, 1, 3],
-		[3, 1, 1, 1, 3],
-		[3, 1, 1, 1, 3],
-		[3, 1, 1, 1, 3],
-		[3, 1, 1, 1, 3],
-		[3, 1, 1, 1, 3],
-		[3, 1, 1, 1, 3],
+	ae: [
+		[3, 4, 4, 4, 4, 1, 4, 4, 4, 4, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3],
 	],
+
+	u: [
+		[3, 4, 4, 4, 4, 6, 4, 4, 4, 4, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+	],
+
+	d: [
+		[3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 3, 3, 3, 3, 6, 3, 3, 3, 3, 3],
+	],
+
+	l: [
+		[3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+	],
+
+	r: [
+		[3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+	],
+
+	ud: [
+		[3, 4, 4, 4, 4, 6, 4, 4, 4, 4, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 3, 3, 3, 3, 6, 3, 3, 3, 3, 3],
+	],
+
+	lr: [
+		[3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+	],
+
+	ul: [
+		[3, 4, 4, 4, 4, 6, 4, 4, 4, 4, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+	],
+
+	ur: [
+		[3, 4, 4, 4, 4, 6, 4, 4, 4, 4, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+	],
+
+	dl: [
+		[3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 3, 3, 3, 3, 6, 3, 3, 3, 3, 3],
+	],
+
+	dr: [
+		[3, 4, 4, 4, 4, 6, 4, 4, 4, 4, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, 3, 3, 3, 3, 6, 3, 3, 3, 3, 3],
+	],
+
+	// hall_ud: [
+	// 	[3, 1, 1, 1, 3],
+	// 	[3, 1, 1, 1, 3],
+	// 	[3, 1, 1, 1, 3],
+	// 	[3, 1, 1, 1, 3],
+	// 	[3, 1, 1, 1, 3],
+	// 	[3, 1, 1, 1, 3],
+	// 	[3, 1, 1, 1, 3],
+	// 	[3, 1, 1, 1, 3],
+	// 	[3, 1, 1, 1, 3],
+	// 	[3, 1, 1, 1, 3],
+	// ],
+
+	// hall_lr: [
+	// 	[4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+	// 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+	// 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+	// 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+	// 	[3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+	// ],
 };
 
 // A single tile, usually as part of a room, but can be secluded. (will not render unless in a room)
@@ -763,19 +928,171 @@ class Tile {
 }
 
 class Door extends Tile {
-	constructor(x, y, type, exits) {
+	constructor(x, y, type, exits, canCreateRooms = true) {
 		super(x, y, type);
 
 		// The room the door exits from.
 		this.exits = exits;
 
-		// Wether the door has generated a new room yet.
+		// The direction from the room that the door faces.
+		this.direction = null;
+		this.calculateDirection();
+
+		// Generate a hallway.
+		// this.generateHallway();
+
+		// Determine if we can create rooms based on outside factors.
+		if (world.roomCount <= 0) {
+			canCreateRooms = false;
+		}
+
+		// Generate the next room.
+		if (canCreateRooms) {
+			let self = this;
+			window.setTimeout(() => {
+				self.generateNextRoom();
+			}, 25);
+		}
 		this.hasGenerated = false;
 
 		// The status of the door.
 		this.open = false;
 		this.locked = false;
 	}
+
+	// Generate a room from the door based on it's direction.
+	generateNextRoom() {
+		// Check if this door has already generated a room.
+		if (this.hasGenerated) {
+			return "This door has already generated a room.";
+		}
+
+		// Apply the fact that this door has generated a room, even if it doesn't because there is already one here.
+		this.hasGenerated = true;
+
+		// Calculate where the room should be.
+		let roomPos = {
+			x: this.x,
+			y: this.y,
+		};
+
+		// Caluculate the type of room.
+		let roomType;
+		switch (this.direction) {
+			case "u":
+				roomType = ["dr", "dl"][Math.floor(Math.random() * 2)];
+				roomPos.y -= rooms[roomType].length * 8; // Move the door towards the right distance.
+				roomPos.x -= Math.round(rooms[roomType][0].length * 3.6); // Line the doors up.
+				break;
+			case "d":
+				roomType = ["ur", "ul"][Math.floor(Math.random() * 2)];
+				roomPos.y += 8; // Move the door towards the right distance.
+				roomPos.x -= Math.round(rooms[roomType][0].length * 3.6); // Line the doors up.
+				break;
+			case "l":
+				roomType = ["ur", "dr"][Math.floor(Math.random() * 2)];
+				roomPos.x -= rooms[roomType][0].length * 8; // Move the door towards the right distance.
+				roomPos.y -= Math.round(rooms[roomType].length * 3.6); // Line the doors up.
+				break;
+			case "r":
+				roomType = ["ul", "dl"][Math.floor(Math.random() * 2)];
+				roomPos.x += 8; // Move the door towards the right distance.
+				roomPos.y -= Math.round(rooms[roomType].length * 3.6); // Line the doors up.
+				break;
+			default:
+				// If the direction is wrong, we straight up return.
+				return;
+		}
+
+		// Check if a room already exists here. If one does, we quit the function now.
+		if (world.getRoom(roomPos.x, roomPos.y).length !== 0) {
+			return;
+		}
+
+		// If there isn't a room here, we generate one.
+		world.createRoomFromData(roomPos.x, roomPos.y, roomType, true, true);
+	}
+
+	// Calculate the direction the door faces going away from the room.
+	calculateDirection() {
+		// Determine the center of the room.
+		let centerOfRoom = {
+			x: this.exits.x + this.exits.width / 2 - 4,
+			y: this.exits.y + this.exits.height / 2 - 4,
+		};
+
+		// Determine the direction from the room.
+		if (this.y === centerOfRoom.y) {
+			// If the door is centered on the y-axis.
+			if (this.x < centerOfRoom.x) {
+				// We are on the left.
+				this.direction = "l";
+			} else {
+				// We are on the right.
+				this.direction = "r";
+			}
+		} else {
+			// If the door is not cented on the y-axis.
+
+			if (this.y < centerOfRoom.y) {
+				// We are above.
+				this.direction = "u";
+			} else {
+				// We are below.
+				this.direction = "d";
+			}
+		}
+	}
+
+	// // Generate a hallway from the door based on it's direction.
+	// generateHallway() {
+	// 	// Calculate where the hallway should be.
+	// 	let hallwayPos = {
+	// 		x: this.x,
+	// 		y: this.y,
+	// 	};
+
+	// 	// Caluculate the type of hallway.
+	// 	let hallwayType;
+	// 	this.direction === "l" || this.direction === "r"
+	// 		? (hallwayType = "lr") // The hallway moves left and right.
+	// 		: (hallwayType = "ud"); // The hallway moves up and down.
+
+	// 	// Move the hallway so it lines up properly.
+	// 	if (hallwayType === "lr") {
+	// 		// If the hallway moves left and right.
+	// 		if (this.direction === "l") {
+	// 			// If the door is heading left.
+	// 			hallwayPos.x -= rooms[hallwayType][0].length * 8 - 8;
+	// 		} else {
+	// 			// If the door is heading right.
+	// 			hallwayPos.x += 8;
+	// 		}
+
+	// 		// Center the hallway.
+	// 		hallwayPos.y -= (rooms[hallwayType].length / 4) * 8 - 6;
+	// 	} else {
+	// 		// If the hallway moves up and down.
+	// 		if (this.direction === "u") {
+	// 			// If the door is heading up.
+	// 			hallwayPos.y -= rooms[hallwayType].length * 8 - 8;
+	// 		} else {
+	// 			// If the door is heading down.
+	// 			hallwayPos.y += 8;
+	// 		}
+
+	// 		// Center the hallway.
+	// 		hallwayPos.x -= (rooms[hallwayType][0].length / 4) * 8 - 6;
+	// 	}
+
+	// 	// Generate the hallway.
+	// 	world.createRoomFromData(
+	// 		hallwayPos.x,
+	// 		hallwayPos.y,
+	// 		`hall_${hallwayType}`,
+	// 		true
+	// 	);
+	// }
 
 	// Check wether or not this tile is currently on-screen.
 	onScreen() {
@@ -870,18 +1187,32 @@ class Door extends Tile {
 
 // A room, contains tiles and events as well as handeling of loot and enemies.
 class Room {
-	constructor(x, y, autogen = true, roomName) {
+	constructor(
+		x,
+		y,
+		autogen = true,
+		roomName,
+		roomsDoorsCanGenerateRooms = true
+	) {
 		// The room's position on-screen.
 		this.x = x;
 		this.y = y;
 
+		this.width = 0;
+		this.height = 0;
+
+		// The room's tiles.
 		this.tiles = [];
+
+		// Determine wether or not the doors in this room can generate more rooms.
+		this.doorsCanGenerateMoreRooms = roomsDoorsCanGenerateRooms;
 
 		// If the room is not autogenerated, generate the tiles from the roomName.
 		if (!autogen) {
+			// Populate tiles from existing room data.
 			this.populateTiles(roomName);
 		} else {
-			// If the room is autogenerated, generate it :|
+			// If the room is autogenerated, generate it and then populate tiles. :|
 			this.autoGen();
 		}
 	}
@@ -889,8 +1220,8 @@ class Room {
 	// Autogenerate a room.
 	autoGen() {
 		// The width and height of the room.
-		let width = randInt(6, 16);
-		let height = randInt(6, 16);
+		let width = randInt(11, 22);
+		let height = randInt(11, 22);
 
 		// The room we generate.
 		let genedRoom = [];
@@ -940,6 +1271,10 @@ class Room {
 			roomData = room;
 		}
 
+		// Apply the width and height. (accurate to pixel-dimensions)
+		this.width = roomData[0].length * 8;
+		this.height = roomData.length * 8;
+
 		// Create all the tiles from the data.
 		for (let y in roomData) {
 			for (let x in roomData[y]) {
@@ -966,13 +1301,18 @@ class Room {
 				}
 
 				// At this point, searchedTile is the key for the tiledata we want.
-				this.createTile(x * 8, y * 8, searchedTile);
+				this.createTile(
+					x * 8,
+					y * 8,
+					searchedTile,
+					this.doorsCanGenerateMoreRooms
+				);
 			}
 		}
 	}
 
 	// Create a tile.
-	createTile(x, y, type) {
+	createTile(x, y, type, doorsCanGenerateMoreRooms = true) {
 		if (type !== "door_closed" && type !== "door_open") {
 			// If it is a regular tile.
 			let tile = new Tile(x + this.x, y + this.y, type);
@@ -982,7 +1322,13 @@ class Room {
 			return tile;
 		} else {
 			// If the tile is a door.
-			let door = new Door(x + this.x, y + this.y, type, this);
+			let door = new Door(
+				x + this.x,
+				y + this.y,
+				type,
+				this,
+				doorsCanGenerateMoreRooms
+			);
 			this.tiles.push(door);
 			world.globalTiles.push(door);
 
@@ -1032,20 +1378,123 @@ class World {
 		// A collection of all the rooms in the world.
 		this.rooms = [];
 		this.globalTiles = [];
+
+		// The maximum amount of rooms in the world.
+		this.roomCount = 100;
+	}
+
+	// Clean up the world after it has been generated.
+	worldCleanup() {
+		console.log("cleaning up the world - 0%");
+
+		// Cleanup doors.
+		let doors = this.globalTiles.filter(
+			(tile) => tile.type === "door_opened" || tile.type === "door_closed"
+		);
+
+		// Loop through all doors and clean them up.
+		for (let door of doors) {
+			// Get the first tile after a door, in the direction that door opens.
+			let tileInDoorDirection = undefined;
+			switch (door.direction) {
+				case "u":
+					tileInDoorDirection = this.getTile(door.x, door.y - 8);
+					break;
+				case "d":
+					tileInDoorDirection = this.getTile(door.x, door.y + 8);
+					break;
+				case "l":
+					tileInDoorDirection = this.getTile(door.x - 8, door.y);
+					break;
+				case "r":
+					tileInDoorDirection = this.getTile(door.x + 8, door.y);
+					break;
+				default:
+					break;
+			}
+
+			if (
+				tileInDoorDirection === undefined ||
+				tileInDoorDirection.type === "wall" ||
+				tileInDoorDirection.type === "wall_ledge"
+			) {
+				// If the adjacent tile is a wall or an empty tile, we destroy the door and replace it with a wall.
+				let room = door.exits;
+				room.destroyTile(door);
+				room.createTile(
+					door.x - room.x,
+					door.y - room.y,
+					door.y - room.y === 0 ? "wall_ledge" : "wall", // Spawn a wall normally, or a ledge if its at the top of the room.
+					false
+				);
+				console.log(door.x, door.y);
+			}
+		}
+
+		console.log("cleaning up the world - 50%");
+
+		// Cleanup rooms.
+
+		console.log("cleaning up the world - 100%");
+	}
+
+	// Get a room by its position.
+	getRoom(x, y) {
+		return this.rooms.filter((room) => room.x == x && room.y == y);
 	}
 
 	// Create a room.
-	createRoom(x, y) {
+	createRoom(x, y, strict = true) {
+		// If there are already too many rooms, we don't make this room.
+		if (this.roomCount <= 0) return;
+
+		// If strict mode is on, and there is a collision with another room, we do not create the room.
 		let room = new Room(x, y, true, null);
+
+		// Loop through all rooms and check for collision.
+		for (let checkedRoom of this.rooms) {
+			if (AABB(room, checkedRoom) && strict) {
+				return "Could not create room. It intersects another room.";
+			}
+		}
+
 		this.rooms.push(room);
+
+		this.roomCount--;
+		if (this.roomCount <= 0) {
+			this.worldCleanup(); // If all rooms have been made, we clean up the map.
+		}
 
 		return room;
 	}
 
 	// Create a room from template data.
-	createRoomFromData(x, y, roomName) {
-		let room = new Room(x, y, false, roomName);
+	createRoomFromData(
+		x,
+		y,
+		roomName,
+		strict = true,
+		roomsDoorsCanGenerateRooms = true
+	) {
+		// If there are already too many rooms, we don't make this room.
+		if (this.roomCount <= 0) return;
+
+		// If strict mode is on, and there is a collision with another room, we do not create the room.
+		let room = new Room(x, y, false, roomName, roomsDoorsCanGenerateRooms);
+
+		// Loop through all rooms and check for collision.
+		for (let checkedRoom of this.rooms) {
+			if (AABB(room, checkedRoom) && strict) {
+				return "Could not create room. It intersects another room.";
+			}
+		}
+
 		this.rooms.push(room);
+
+		this.roomCount--;
+		if (this.roomCount <= 0) {
+			this.worldCleanup(); // If all rooms have been made, we clean up the map.
+		}
 
 		return room;
 	}
@@ -1085,5 +1534,12 @@ class World {
 let world = new World();
 
 // Create a spawn area.
-// world.createRoomFromData(0, 0, "spawn");
-world.createRoom(0, 0);
+world.createRoomFromData(
+	0,
+	0,
+	// ["a", "u", "d", "l", "r", "ul", "ur", "dl", "dr"][
+	// 	Math.floor(Math.random() * 9)
+	// ]
+	"a"
+);
+// world.createRoom(0, 0);
