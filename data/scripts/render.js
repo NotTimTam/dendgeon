@@ -78,6 +78,7 @@ function renderNumber(x, y, number) {
 function renderLoop() {
 	// If the world hasn't finished generating, we don't render.
 	if (!world.finishedGenerating) {
+		clearCanvas();
 		ctx.beginPath();
 
 		ctx.font = "bold 12px consolas";
