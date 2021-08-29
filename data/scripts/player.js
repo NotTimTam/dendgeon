@@ -96,7 +96,7 @@ class Player {
 				height: 0,
 			},
 		};
-		this.hitStrength = 1; // How much damage the player does.
+		this.hitStrength = 1 * 0.25; // How much damage the player does.
 
 		// Load the player's attack animation spritesheet.
 		this.load_attack_spritesheet();

@@ -9,21 +9,16 @@ class Enemy {
 		// Animation handling.
 		this.animation = {
 			map: undefined,
-			name: "stand", // The name of the current animation.
+			name: "move", // The name of the current animation.
 			frame: 0, // The frame of the current animation.
-			speed: 0, // The speed of the current animation.
-			overallSpeed: 4, // The top speed of an animation, calculated with the current speed of the enemy in mind. (lower numbers are faster)
+			speed: 16, // The speed of the current animation.
 			direction: 0, // The direction the animation should be facing.
 			tick: 0, // The current position in the frame.
 			frameCounts: {
 				// How many frames are in each animation, and at what frame they start.
-				stand: {
+				move: {
 					start: 0,
-					end: 0,
-				},
-				walk: {
-					start: 1,
-					end: 2,
+					end: 1,
 				},
 			},
 		};
@@ -52,11 +47,11 @@ class Enemy {
 		this.speed > 8 ? (this.speed = 8) : "";
 
 		// The position around the player to move to.
-		this.angleToPlayer = randInt(0, 360);
-		this.distanceToPlayer = randInt(10, 2);
+		this.distanceToPlayer = 12;
 
 		// enemy stats.
 		this.health = health;
+		this.maxHealth = health;
 		this.damage = 1;
 	}
 
@@ -71,11 +66,6 @@ class Enemy {
 
 	// Handle animations
 	animate() {
-		// Match the animation speed to the enemy's movement speed.
-		this.animation.speed =
-			(this.physics.velocity.velocity / this.speed) *
-			this.animation.overallSpeed;
-
 		// Update animation steps.
 		this.animation.tick++; // Add to the tick.
 
@@ -83,13 +73,6 @@ class Enemy {
 		if (this.animation.tick > this.animation.speed) {
 			this.animation.tick = 0;
 			this.animation.frame++;
-		}
-
-		// Determine which animation should be playing.
-		if (this.physics.velocity.velocity < 0.01) {
-			this.animation.name = "stand";
-		} else {
-			this.animation.name = "walk";
 		}
 
 		// If we have finished an animation, restart it.
@@ -107,101 +90,44 @@ class Enemy {
 		}
 	}
 
-	// Check for a collision in a direction.
-	checkCol(dir) {
-		// The hypothetical bounding box, or where the enemy would be if the movement was applied.
-		let hbb = {
-			x: this.x,
-			y: this.y,
-			width: 8,
-			height: 8,
-		};
-
-		// The tile position in the world the enemy would be in if we moved.
-		let hbbTilePos = worldToTile(hbb.x, hbb.y);
-
-		// Check collisions with tiles.
-		for (let tile of world.globalTiles) {
-			if (distance(tile.x, tile.y, hbb.x, hbb.y) <= 16) {
-				if (AABB(hbb, tile) && tile.data.solid) {
-					return true;
-				}
-			} else {
-				continue;
-			}
-		}
-
-		return false;
-	}
-
-	// Check collisions with other enemies.
-	checkColWithEnemies() {
-		// The hypothetical bounding box, or where the enemy would be if the movement was applied.
-		let hbb = {
-			x: this.x,
-			y: this.y,
-			width: 8,
-			height: 8,
-		};
-
-		// Check collisions with other enemies.
-		for (let enemy of this.origin.enemyCache) {
-			if (enemy === this) {
-				continue; // Skip this in the array.
-			}
-
-			// Check the collision.
-			if (AABB(hbb, enemy)) {
-				return enemy;
-			}
-		}
-
-		return false;
-	}
-
 	logic() {
 		// Store the enemy's current position.
 		this.physics.lastX = this.x;
 		this.physics.lastY = this.y;
 
-		let targetPos = cartesian2(this.angleToPlayer, 0);
+		let targetPos = cartesian2(
+			angle(player, this),
+			distance(this.x, this.y, player.x, player.y) / 6
+		);
 
 		// Check for collisions in the direction of travel and then apply the travel if there are none.
-		// if (
-		// 	distance(
-		// 		this.x + 4,
-		// 		this.y + 4,
-		// 		player.x + 4 + targetPos.x,
-		// 		player.y + 4 + targetPos.y
-		// 	) > 10
-		// ) {
-		if (player.y + 4 + targetPos.y < this.y) {
-			if (!this.checkCol(0)) {
+		if (
+			distance(
+				this.x + 4,
+				this.y + 4,
+				player.x + 4 + targetPos.x,
+				player.y + 4 + targetPos.y
+			) > 12
+		) {
+			if (player.y + 4 + targetPos.y < this.y) {
 				this.y -= this.speed;
+				this.dir = 0;
 			}
-			this.dir = 0;
-		}
-		if (player.x + 4 + targetPos.x > this.x) {
-			if (!this.checkCol(1)) {
+			if (player.x + 4 + targetPos.x > this.x) {
 				this.x += this.speed;
 				this.animation.direction = 1; // Set the player's animation direction.
+				this.dir = 1;
 			}
-			this.dir = 1;
-		}
-		if (player.y + 4 + targetPos.y > this.y) {
-			if (!this.checkCol(2)) {
+			if (player.y + 4 + targetPos.y > this.y) {
 				this.y += this.speed;
+				this.dir = 2;
 			}
-			this.dir = 2;
-		}
-		if (player.x + 4 + targetPos.x < this.x) {
-			if (!this.checkCol(3)) {
+			if (player.x + 4 + targetPos.x < this.x) {
 				this.x -= this.speed;
 				this.animation.direction = -1; // Set the player's animation direction.
+				this.dir = 3;
 			}
-			this.dir = 3;
 		}
-		//}
 
 		// Check if we get hit by the player.
 		if (
@@ -216,6 +142,9 @@ class Enemy {
 		if (this.health <= 0) {
 			this.origin.destroyEnemy(this);
 		}
+
+		this.x = Math.round(this.x);
+		this.y = Math.round(this.y);
 
 		// Calculate the enemy's velocity.
 		this.physics.velocity = vector2(
@@ -234,7 +163,7 @@ class Enemy {
 			ctx.drawImage(
 				this.animation.map, // The tilemap image.
 				this.animation.frame * 8 +
-					(this.animation.direction === 1 && 24), // The x and y sub-coordinates to grab the tile's texture from the image.
+					(this.animation.direction === 1 && 16), // The x and y sub-coordinates to grab the tile's texture from the image.
 				0,
 				8, // The 8x8 pixel dimensions of that sub-image.
 				8,
@@ -247,6 +176,31 @@ class Enemy {
 			ctx.closePath();
 
 			// Render health bar.
+			ctx.beginPath(); // Background.
+
+			ctx.fillStyle = "black";
+
+			ctx.fillRect(
+				this.x - player.camera.x - 2,
+				this.y - player.camera.y - 1,
+				12,
+				1
+			);
+
+			ctx.closePath();
+
+			ctx.beginPath(); // Bar.
+
+			ctx.fillStyle = "limegreen";
+
+			ctx.fillRect(
+				this.x - player.camera.x - 2,
+				this.y - player.camera.y - 1,
+				12 * (this.health / this.maxHealth),
+				1
+			);
+
+			ctx.closePath();
 		} catch {
 			return;
 		}

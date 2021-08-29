@@ -583,6 +583,16 @@ class Room {
 	eventHandler() {
 		if (this.cleared) return; // If the room has already been cleared we have nothing to do.
 
+		// These happen every frame when the room is not cleared.
+		// If the hostile type room is cleared of enemies.
+		if (
+			this.active &&
+			this.type === "hostile" &&
+			this.enemyCache.length <= 0
+		) {
+			this.cleared = true;
+		}
+
 		// If we have not been cleared, then we check if the player has entered the room, and activate it, unless it is already active.
 		if (
 			AABB(this, player) &&
@@ -667,12 +677,6 @@ class Room {
 					false
 				);
 			}
-		}
-
-		// These happen every frame when the room is not cleared.
-		// If the hostile type room is cleared of enemies.
-		if (this.active && this.type === "hostile" && this.enemies <= 0) {
-			this.cleared = true;
 		}
 	}
 
@@ -806,6 +810,16 @@ class Room {
 		world.globalTiles.splice(world.globalTiles.indexOf(tile), 1);
 	}
 
+	// Render this room's enemies.
+	renderEnemies(ctx) {
+		// Render all enemies in the room.
+		if (this.type === "hostile" && this.enemyCache.length > 0) {
+			for (let enemy of this.enemyCache) {
+				enemy.render(ctx);
+			}
+		}
+	}
+
 	logic() {
 		// Run the event handler for this room.
 		this.eventHandler();
@@ -844,12 +858,8 @@ class Room {
 			tile.render(ctx);
 		}
 
-		// Render all enemies in the room.
-		if (this.type === "hostile" && this.enemyCache.length > 0) {
-			for (let enemy of this.enemyCache) {
-				enemy.render(ctx);
-			}
-		}
+		// Render all enemies.
+		// this.renderEnemies(ctx);
 	}
 }
 
@@ -932,7 +942,7 @@ class World {
 
 	// Get a room by its position.
 	getRoom(x, y) {
-		return this.rooms.filter((room) => room.x == x && room.y == y);
+		return this.rooms.filter((room) => room.x === x && room.y === y);
 	}
 
 	// Create a room.

@@ -106,6 +106,7 @@ function renderLoop() {
 		world.render(ctx); // Render the world, all of its rooms and tiles.
 		items.render(ctx); // Render all the items in the game.
 		player.render(ctx); // Render the player.
+		world.getRoom(player.roomPos.x, player.roomPos.y)[0].renderEnemies(ctx); // Render nearby enemies.
 
 		player.renderUI(ctx); // Render the player's UI.
 	}
