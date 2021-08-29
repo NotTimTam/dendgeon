@@ -451,7 +451,7 @@ class Door extends Tile {
 			dt <= 9 &&
 			!this.open &&
 			!this.locked &&
-			(keyboard.z || keyboard.k)
+			(keyboard.x || keyboard.k)
 		) {
 			this.open = true;
 		}
@@ -576,7 +576,7 @@ class Room {
 
 	// Destroying enemies.
 	destroyEnemy(enemy) {
-		this.enemies.splice(this.enemies.indexOf(enemy), 1);
+		this.enemyCache.splice(this.enemyCache.indexOf(enemy), 1);
 	}
 
 	// Handle all events: loot, enemy spawning, etc.

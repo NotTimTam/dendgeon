@@ -79,6 +79,27 @@ class Player {
 			health: 3,
 			coin: 0,
 		};
+
+		// Player attack.
+		this.attackAnimation = {
+			attacking: false,
+			map: undefined,
+			frame: 0, // The frame of the animation.
+			speed: 1, // The speed of the current animation.
+			direction: 0, // The direction the animation should be facing.
+			tick: 0, // The current position in the frame.
+			endFrame: 6,
+			hitbox: {
+				x: 0,
+				y: 0,
+				width: 0,
+				height: 0,
+			},
+		};
+		this.hitStrength = 1; // How much damage the player does.
+
+		// Load the player's attack animation spritesheet.
+		this.load_attack_spritesheet();
 	}
 
 	// Load the image source for the spritesheet. Should be done before any rendering is attempted. But the rendering is given a try catch since JS is asynchronous.
@@ -88,6 +109,41 @@ class Player {
 			this.animation.map = img;
 		};
 		img.src = "./data/images/spritesheet_player.png";
+	}
+
+	// Load the image source for the attack spritesheet.
+	load_attack_spritesheet() {
+		let img = new Image();
+		img.onload = () => {
+			this.attackAnimation.map = img;
+		};
+		img.src = "./data/images/spritesheet_player_attack.png";
+	}
+
+	// Attack handling.
+	attack() {
+		if (!this.attackAnimation.attacking) {
+			this.attackAnimation.attacking = true;
+		}
+	}
+	animateAttacking() {
+		// Only animate the attack animation if we are attacking.
+		if (this.attackAnimation.attacking) {
+			// Update animation steps.
+			this.attackAnimation.tick++; // Add to the tick.
+
+			// Move to the next frame if the speed/tick counter completes.
+			if (this.attackAnimation.tick > this.attackAnimation.speed) {
+				this.attackAnimation.tick = 0;
+				this.attackAnimation.frame++;
+			}
+
+			// If we have finished an animation, then we end.
+			if (this.attackAnimation.frame > this.attackAnimation.endFrame) {
+				this.attackAnimation.frame = 0;
+				this.attackAnimation.attacking = false;
+			}
+		}
 	}
 
 	// Handle animations
@@ -126,6 +182,9 @@ class Player {
 			this.animation.frame =
 				this.animation.frameCounts[this.animation.name].start;
 		}
+
+		// Animate attacking.
+		this.animateAttacking();
 	}
 
 	// Check for a collision in a direction.
@@ -284,6 +343,11 @@ class Player {
 			this.dir = 3;
 		}
 
+		// Attack
+		if (keyboard.j || keyboard.z) {
+			this.attack();
+		}
+
 		// Calculate the player's velocity.
 		this.physics.velocity = vector2(
 			Math.abs(this.x - this.physics.lastX),
@@ -336,17 +400,83 @@ class Player {
 			ctx.drawImage(
 				this.animation.map, // The tilemap image.
 				this.animation.frame * 8 +
-					(this.animation.direction === 1 && 32), // The x and y sub-coordinates to grab the tile's texture from the image.
+					(this.animation.direction === 1 && 32), // The x and y sub-coordinates to grab the animation's texture from the image.
 				0,
 				8, // The 8x8 pixel dimensions of that sub-image.
 				8,
-				this.x - this.camera.x, // Proper placement of the tile on screen.
+				this.x - this.camera.x, // Proper placement of the animation on screen.
 				this.y - this.camera.y,
-				8, // The size of the tile, as drawn on screen.
+				8, // The size of the animation, as drawn on screen.
 				8
 			);
 
 			ctx.closePath();
+
+			// Render attack
+			if (this.attackAnimation.attacking) {
+				let pos = {
+					x: 0,
+					y: 0,
+				};
+				switch (this.dir) {
+					case 0:
+						pos.y -= 7;
+						this.attackAnimation.hitbox = {
+							x: this.x + pos.x + 1,
+							y: this.y + pos.y + 3,
+							width: 7,
+							height: 3,
+						};
+						break;
+					case 1:
+						pos.x += 8;
+						pos.y++;
+						this.attackAnimation.hitbox = {
+							x: this.x + pos.x + 1,
+							y: this.y + pos.y + 1,
+							width: 3,
+							height: 7,
+						};
+						break;
+					case 2:
+						pos.y += 8;
+						this.attackAnimation.hitbox = {
+							x: this.x + pos.x + 1,
+							y: this.y + pos.y + 1,
+							width: 7,
+							height: 3,
+						};
+						break;
+					case 3:
+						pos.x -= 8;
+						pos.y++;
+						this.attackAnimation.hitbox = {
+							x: this.x + pos.x + 4,
+							y: this.y + pos.y + 1,
+							width: 3,
+							height: 7,
+						};
+						break;
+					default:
+						break;
+				}
+
+				ctx.beginPath();
+
+				ctx.drawImage(
+					this.attackAnimation.map, // The tilemap image.
+					this.attackAnimation.frame * 8 + this.dir * 56, // The x and y sub-coordinates to grab the animation's texture from the image.
+					0,
+					8, // The 8x8 pixel dimensions of that sub-image.
+					8,
+					this.x + pos.x - this.camera.x, // Proper placement of the animation on screen.
+					this.y + pos.y - this.camera.y,
+					8, // The size of the animation, as drawn on screen.
+					8
+				);
+
+				ctx.closePath();
+			}
 		} catch {
 			return;
 		}

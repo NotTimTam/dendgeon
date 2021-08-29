@@ -203,6 +203,15 @@ class Enemy {
 		}
 		//}
 
+		// Check if we get hit by the player.
+		if (
+			player.attackAnimation.attacking &&
+			player.attackAnimation.frame === 3 &&
+			AABB(this, player.attackAnimation.hitbox)
+		) {
+			this.health -= player.hitStrength;
+		}
+
 		// Check the enemy's health.
 		if (this.health <= 0) {
 			this.origin.destroyEnemy(this);
@@ -219,6 +228,7 @@ class Enemy {
 
 	render(ctx) {
 		try {
+			// Render enemy.
 			ctx.beginPath();
 
 			ctx.drawImage(
@@ -235,6 +245,8 @@ class Enemy {
 			);
 
 			ctx.closePath();
+
+			// Render health bar.
 		} catch {
 			return;
 		}
