@@ -85,7 +85,7 @@ class Player {
 			attacking: false,
 			map: undefined,
 			frame: 0, // The frame of the animation.
-			speed: 1, // The speed of the current animation.
+			speed: 0, // The speed of the current animation.
 			direction: 0, // The direction the animation should be facing.
 			tick: 0, // The current position in the frame.
 			endFrame: 6,
@@ -97,6 +97,7 @@ class Player {
 			},
 		};
 		this.hitStrength = 1 * 0.25; // How much damage the player does.
+		this.knockback = 4;
 
 		// Load the player's attack animation spritesheet.
 		this.load_attack_spritesheet();

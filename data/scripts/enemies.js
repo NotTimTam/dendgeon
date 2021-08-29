@@ -20,6 +20,10 @@ class Enemy {
 					start: 0,
 					end: 1,
 				},
+				hit: {
+					start: 2,
+					end: 3,
+				},
 			},
 		};
 
@@ -53,6 +57,7 @@ class Enemy {
 		this.health = health;
 		this.maxHealth = health;
 		this.damage = 1;
+		this.gotHit = 0; // How long to display that the enemy got hit.
 	}
 
 	// Load the image source for the spritesheet. Should be done before any rendering is attempted. But the rendering is given a try catch since JS is asynchronous.
@@ -68,6 +73,13 @@ class Enemy {
 	animate() {
 		// Update animation steps.
 		this.animation.tick++; // Add to the tick.
+
+		// If we've been hit recently
+		if (this.gotHit > 0) {
+			this.animation.name = "hit";
+		} else {
+			this.animation.name = "move";
+		}
 
 		// Move to the next frame if the speed/tick counter completes.
 		if (this.animation.tick > this.animation.speed) {
@@ -91,6 +103,9 @@ class Enemy {
 	}
 
 	logic() {
+		// Subtract from the amount of time that we display we got hit.
+		this.gotHit--;
+
 		// Store the enemy's current position.
 		this.physics.lastX = this.x;
 		this.physics.lastY = this.y;
@@ -100,6 +115,11 @@ class Enemy {
 			distance(this.x, this.y, player.x, player.y) / 6
 		);
 
+		let otherTarget = cartesian2(Math.random() * 360, randInt(32, 64));
+
+		targetPos.x += otherTarget.x;
+		targetPos.y += otherTarget.y;
+
 		// Check for collisions in the direction of travel and then apply the travel if there are none.
 		if (
 			distance(
@@ -107,7 +127,7 @@ class Enemy {
 				this.y + 4,
 				player.x + 4 + targetPos.x,
 				player.y + 4 + targetPos.y
-			) > 12
+			) > 14
 		) {
 			if (player.y + 4 + targetPos.y < this.y) {
 				this.y -= this.speed;
@@ -115,7 +135,6 @@ class Enemy {
 			}
 			if (player.x + 4 + targetPos.x > this.x) {
 				this.x += this.speed;
-				this.animation.direction = 1; // Set the player's animation direction.
 				this.dir = 1;
 			}
 			if (player.y + 4 + targetPos.y > this.y) {
@@ -124,9 +143,15 @@ class Enemy {
 			}
 			if (player.x + 4 + targetPos.x < this.x) {
 				this.x -= this.speed;
-				this.animation.direction = -1; // Set the player's animation direction.
 				this.dir = 3;
 			}
+		}
+
+		// Set the enemies animation direction.
+		if (player.x > this.x) {
+			this.animation.direction = 1;
+		} else {
+			this.animation.direction = 0;
 		}
 
 		// Check if we get hit by the player.
@@ -136,6 +161,14 @@ class Enemy {
 			AABB(this, player.attackAnimation.hitbox)
 		) {
 			this.health -= player.hitStrength;
+
+			// Knockback.
+			let knockback = cartesian2(angle(this, player), player.knockback);
+
+			this.x += knockback.x;
+			this.y += knockback.y;
+
+			this.gotHit = 60;
 		}
 
 		// Check the enemy's health.
@@ -163,7 +196,7 @@ class Enemy {
 			ctx.drawImage(
 				this.animation.map, // The tilemap image.
 				this.animation.frame * 8 +
-					(this.animation.direction === 1 && 16), // The x and y sub-coordinates to grab the tile's texture from the image.
+					(this.animation.direction === 1 && 32), // The x and y sub-coordinates to grab the tile's texture from the image.
 				0,
 				8, // The 8x8 pixel dimensions of that sub-image.
 				8,
