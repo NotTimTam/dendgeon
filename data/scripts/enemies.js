@@ -224,7 +224,8 @@ class Enemy {
 
 			ctx.beginPath(); // Bar.
 
-			ctx.fillStyle = "limegreen";
+			ctx.fillStyle =
+				this.health / this.maxHealth <= 0.25 ? "tomato" : "limegreen";
 
 			ctx.fillRect(
 				this.x - player.camera.x - 2,

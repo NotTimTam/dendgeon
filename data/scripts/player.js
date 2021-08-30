@@ -51,7 +51,7 @@ class Player {
 		this.dir = 3;
 
 		// Light.
-		this.lightStrength = 15;
+		this.lightStrength = 10;
 
 		// Max movement speed.
 		this.speed = 1;
@@ -62,6 +62,9 @@ class Player {
 
 		// The room the player is in.
 		this.roomPos = {};
+
+		// How many rooms the player has cleared.
+		this.roomsCleared = 0;
 
 		// The tile the player is moving towards.
 		this.goalTile = {};
@@ -251,6 +254,16 @@ class Player {
 		return false;
 	}
 
+	// Render a minimap.
+	renderMiniMap(ctx) {
+		ctx.beginPath();
+
+		ctx.fillStyle = "white";
+		ctx.fillRect(canvas.width - 8, 0, 8, 8);
+
+		ctx.closePath();
+	}
+
 	// Render the player's ui.
 	renderUI(ctx) {
 		// Health.
@@ -302,6 +315,9 @@ class Player {
 				this.inventory.coin > 999 ? 999 : this.inventory.coin
 			);
 		} catch {}
+
+		// Render the mini-map.
+		this.renderMiniMap(ctx);
 	}
 
 	input() {

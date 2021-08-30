@@ -613,7 +613,6 @@ class Room {
 		// Once the room has been triggered:
 		if (this.triggered && !this.cleared) {
 			// If it has not been cleared, than we start the event.
-			console.log("STARTING ROOM");
 
 			this.triggered = false; // Remove the trigger so this only happens once.
 			this.active = true; // Activate the room.
@@ -658,7 +657,7 @@ class Room {
 		// When the room is cleared. This happens once.
 		if (this.cleared && this.active) {
 			// If it has been cleared, then we remove the doors.
-			console.log("CLEARED ROOM");
+			player.roomsCleared++; // Add to the count of how many rooms the player has cleared.
 
 			this.triggered = false; // Remove the trigger so this only happens once.
 			this.active = false;
@@ -873,6 +872,17 @@ class World {
 		// The maximum amount of rooms in the world.
 		this.roomCount = 100;
 		this.finishedGenerating = false; // If the world has finished generating.
+	}
+
+	// Get the positional bounds of the entire map.
+	getPositionalBounds() {
+		bingbong FINISH THIS
+		return {
+			lowX: 0,
+			lowY: 0,
+			highX: 0,
+			highY: 0,
+		};
 	}
 
 	// Clean up the world after it has been generated.
