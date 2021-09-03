@@ -256,51 +256,42 @@ class Player {
 
 	// Render a minimap.
 	renderMiniMap(ctx) {
-		let minimapSize = 32;
+		// Where the top-left corner of the minimap is on the screen.
 		let minimap = {
-			x: canvas.width - minimapSize - 2,
-			y: canvas.height - minimapSize - 2,
+			x: canvas.width - 16 - player.roomPos.x / 88,
+			y: canvas.height - 16 - player.roomPos.y / 88,
 		};
 
-		let data = [];
-
+		// Draw all the rooms.
 		for (let room of world.rooms) {
-			let truePos = {
-				x: room.x / 88,
-				y: room.y / 88,
-			};
+			ctx.save();
+			ctx.beginPath();
 
-			if (data[truePos.y] === undefined) {
-				data[truePos.y] = [];
-			}
+			ctx.globalAlpha =
+				350 / distance(player.x, player.y, room.x, room.y);
+			ctx.fillStyle = room.cleared ? "limegreen" : "maroon";
 
-			data[truePos.y][truePos.x] = room.cleared;
+			ctx.fillRect(
+				Math.round(minimap.x + room.x / 88),
+				Math.round(minimap.y + room.y / 88),
+				1,
+				1
+			);
+
+			ctx.closePath();
+			ctx.restore();
 		}
 
-		let lgt = 0;
-		for (let y in data) {
-			if (y.length > lgt) {
-				lgt = y.length;
-			}
-		}
-
-		for (let y in data) {
-			for (let x in data[y]) {
-				let tileData = data[y][x];
-
-				ctx.beginPath();
-				ctx.fillStyle = tileData ? "limegreen" : "tomato";
-
-				ctx.fillRect(
-					Math.round(minimap.x + 10 - x - this.camera.x / lgt),
-					Math.round(minimap.y + 6 - y - this.camera.y / data.length),
-					1,
-					1
-				);
-
-				ctx.closePath();
-			}
-		}
+		// Draw what room the player is in.
+		ctx.beginPath();
+		ctx.fillStyle = "white";
+		ctx.fillRect(
+			Math.round(minimap.x + player.roomPos.x / 88),
+			Math.round(minimap.y + player.roomPos.y / 88),
+			1,
+			1
+		);
+		ctx.closePath();
 	}
 
 	// Render the player's ui.
