@@ -890,7 +890,7 @@ class World {
 		this.globalTiles = [];
 
 		// The maximum amount of rooms in the world.
-		this.roomCount = 100;
+		this.roomCount = 25;
 		this.finishedGenerating = false; // If the world has finished generating. (disabled so you can see the world grow on the mini-map)
 		this.positionalBounds = {}; // A place to store positional bounds after the world has been generated.
 	}

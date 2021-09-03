@@ -268,7 +268,7 @@ class Player {
 			ctx.beginPath();
 
 			ctx.globalAlpha =
-				350 / distance(player.x, player.y, room.x, room.y);
+				150 / distance(player.x, player.y, room.x, room.y);
 			ctx.fillStyle = room.cleared ? "limegreen" : "maroon";
 
 			ctx.fillRect(
@@ -299,7 +299,7 @@ class Player {
 				JSON.stringify(world.rooms.length - player.roomsCleared)
 					.length *
 					9,
-			canvas.height - 8,
+			canvas.height - 9,
 			world.rooms.length - player.roomsCleared
 		);
 	}
