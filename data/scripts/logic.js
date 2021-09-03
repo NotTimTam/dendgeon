@@ -872,17 +872,35 @@ class World {
 		// The maximum amount of rooms in the world.
 		this.roomCount = 100;
 		this.finishedGenerating = false; // If the world has finished generating.
+		this.positionalBounds = {}; // A place to store positional bounds after the world has been generated.
 	}
 
 	// Get the positional bounds of the entire map.
 	getPositionalBounds() {
-		bingbong FINISH THIS
-		return {
+		let positions = {
 			lowX: 0,
 			lowY: 0,
 			highX: 0,
 			highY: 0,
 		};
+
+		for (let room of this.rooms) {
+			if (room.x < positions.lowX) {
+				positions.lowX = room.x;
+			} else if (room.x > positions.highX) {
+				positions.highX = room.x;
+			}
+
+			if (room.y < positions.lowY) {
+				positions.lowY = room.y;
+			} else if (room.y > positions.highY) {
+				positions.highY = room.y;
+			}
+		}
+
+		this.positionalBounds = positions;
+
+		return positions;
 	}
 
 	// Clean up the world after it has been generated.
@@ -945,6 +963,9 @@ class World {
 				);
 			}
 		});
+
+		// Get and store the positional bounds.
+		this.getPositionalBounds();
 
 		// Set that the game has finished loading the world to true.
 		this.finishedGenerating = true;

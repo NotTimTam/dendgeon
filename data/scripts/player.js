@@ -256,12 +256,51 @@ class Player {
 
 	// Render a minimap.
 	renderMiniMap(ctx) {
-		ctx.beginPath();
+		let minimapSize = 32;
+		let minimap = {
+			x: canvas.width - minimapSize - 2,
+			y: canvas.height - minimapSize - 2,
+		};
 
-		ctx.fillStyle = "white";
-		ctx.fillRect(canvas.width - 8, 0, 8, 8);
+		let data = [];
 
-		ctx.closePath();
+		for (let room of world.rooms) {
+			let truePos = {
+				x: room.x / 88,
+				y: room.y / 88,
+			};
+
+			if (data[truePos.y] === undefined) {
+				data[truePos.y] = [];
+			}
+
+			data[truePos.y][truePos.x] = room.cleared;
+		}
+
+		let lgt = 0;
+		for (let y in data) {
+			if (y.length > lgt) {
+				lgt = y.length;
+			}
+		}
+
+		for (let y in data) {
+			for (let x in data[y]) {
+				let tileData = data[y][x];
+
+				ctx.beginPath();
+				ctx.fillStyle = tileData ? "limegreen" : "tomato";
+
+				ctx.fillRect(
+					Math.round(minimap.x + 10 - x - this.camera.x / lgt),
+					Math.round(minimap.y + 6 - y - this.camera.y / data.length),
+					1,
+					1
+				);
+
+				ctx.closePath();
+			}
+		}
 	}
 
 	// Render the player's ui.
