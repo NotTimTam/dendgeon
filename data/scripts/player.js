@@ -292,6 +292,16 @@ class Player {
 			1
 		);
 		ctx.closePath();
+
+		// Draw the number of rooms left.
+		renderNumber(
+			canvas.width -
+				JSON.stringify(world.rooms.length - player.roomsCleared)
+					.length *
+					9,
+			canvas.height - 8,
+			world.rooms.length - player.roomsCleared
+		);
 	}
 
 	// Render the player's ui.

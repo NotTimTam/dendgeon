@@ -299,26 +299,46 @@ class Door extends Tile {
 
 		// Caluculate the type of room.
 		let roomType;
+		let perlin = (x, y) => {
+			// Convert the x and y to room coordinates. (0 (px) === 0 (room pos), 88 (px) === 1 (room pos))
+			x /= 88;
+			y /= 88;
+
+			// Generate perlin noise for determining the room type.
+			let resolution = 0.35; // Finally tunes the noise to different effects.
+			let perlin_noise = noise.simplex2(x * resolution, y * resolution);
+
+			// Return needs to be a binary value. (0 or 1)
+			return perlin_noise > 0 ? 1 : 0;
+		};
 		switch (this.direction) {
 			case "u":
-				roomType = ["dr", "dl"][Math.floor(Math.random() * 2)];
-				roomPos.y -= rooms[roomType].length * 8; // Move the door towards the right distance.
-				roomPos.x -= Math.round(rooms[roomType][0].length * 3.6); // Line the doors up.
+				roomPos.y -= 11 * 8; // Move the door towards the right distance.
+				roomPos.x -= Math.round(11 * 3.6); // Line the doors up.
+
+				roomType = ["dr", "dl"][perlin(roomPos.x, roomPos.y)]; // Determine the room type.
+
 				break;
 			case "d":
-				roomType = ["ur", "ul"][Math.floor(Math.random() * 2)];
 				roomPos.y += 8; // Move the door towards the right distance.
-				roomPos.x -= Math.round(rooms[roomType][0].length * 3.6); // Line the doors up.
+				roomPos.x -= Math.round(11 * 3.6); // Line the doors up.
+
+				roomType = ["ur", "ul"][perlin(roomPos.x, roomPos.y)]; // Determine the room type.
+
 				break;
 			case "l":
-				roomType = ["ur", "dr"][Math.floor(Math.random() * 2)];
-				roomPos.x -= rooms[roomType][0].length * 8; // Move the door towards the right distance.
-				roomPos.y -= Math.round(rooms[roomType].length * 3.6); // Line the doors up.
+				roomPos.x -= 11 * 8; // Move the door towards the right distance.
+				roomPos.y -= Math.round(11 * 3.6); // Line the doors up.
+
+				roomType = ["ur", "dr"][perlin(roomPos.x, roomPos.y)]; // Determine the room type.
+
 				break;
 			case "r":
-				roomType = ["ul", "dl"][Math.floor(Math.random() * 2)];
 				roomPos.x += 8; // Move the door towards the right distance.
-				roomPos.y -= Math.round(rooms[roomType].length * 3.6); // Line the doors up.
+				roomPos.y -= Math.round(11 * 3.6); // Line the doors up.
+
+				roomType = ["ul", "dl"][perlin(roomPos.x, roomPos.y)]; // Determine the room type.
+
 				break;
 			default:
 				// If the direction is wrong, we straight up return.
@@ -871,7 +891,7 @@ class World {
 
 		// The maximum amount of rooms in the world.
 		this.roomCount = 100;
-		this.finishedGenerating = false; // If the world has finished generating.
+		this.finishedGenerating = false; // If the world has finished generating. (disabled so you can see the world grow on the mini-map)
 		this.positionalBounds = {}; // A place to store positional bounds after the world has been generated.
 	}
 
