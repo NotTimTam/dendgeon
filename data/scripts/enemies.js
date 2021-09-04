@@ -1,5 +1,11 @@
 "use strict";
 
+/* 
+While enemies are technically entites. Due to being a large object in the game and having
+many very specific functions, they are excluded from the entity management system. They
+also are rendered above other entities, just like the player.
+*/
+
 // Enemies.
 class Enemy {
 	constructor(x, y, origin, health = 1) {

@@ -1,3 +1,6 @@
+// Thank you to josephg for this perlin noise library.
+// https://github.com/josephg/noisejs
+
 (function (t) {
 	function o(t, o, r) {
 		(this.x = t), (this.y = o), (this.z = r);
