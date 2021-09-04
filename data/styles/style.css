@@ -21,7 +21,7 @@ body {
 
 canvas {
 	background: black;
-	border-radius: 10px;
+	border-radius: calc((0.5vw + 0.5vh) / 2);
 	border: calc((0.5vw + 0.5vh) / 2) solid #7c1934;
 
 	position: absolute;

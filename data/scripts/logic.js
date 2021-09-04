@@ -225,9 +225,8 @@ class Tile {
 			if (renderLighting) {
 				ctx.save();
 
-				ctx.globalAlpha =
-					player.lightStrength /
-					distance(this.x, this.y, player.x, player.y);
+				// Get and apply the lighting data for this tile.
+				ctx.globalAlpha = world.getLightingData(this.x, this.y);
 			}
 
 			ctx.beginPath();
@@ -496,9 +495,8 @@ class Door extends Tile {
 			if (renderLighting) {
 				ctx.save();
 
-				ctx.globalAlpha =
-					player.lightStrength /
-					distance(this.x, this.y, player.x, player.y);
+				// Get and apply the lighting data for this tile.
+				ctx.globalAlpha = world.getLightingData(this.x, this.y);
 			}
 
 			ctx.beginPath();
@@ -905,10 +903,30 @@ class World {
 		this.rooms = [];
 		this.globalTiles = [];
 
+		// Lighting.
+		this.globalLights = [];
+
 		// The maximum amount of rooms in the world.
 		this.roomCount = 25;
 		this.finishedGenerating = false; // If the world has finished generating. (disabled so you can see the world grow on the mini-map)
 		this.positionalBounds = {}; // A place to store positional bounds after the world has been generated.
+	}
+
+	// Calculates the lighting of a tile based on light sources around it.
+	getLightingData(x, y) {
+		// Loop through all the lights and calculate the lighting values. This is done by getting the average of all light applied to the tile.
+		let finalizedLightValue = 0;
+
+		for (let lightSource of this.globalLights) {
+			// Calculate the strength of the light on the tile. If the light source doesn't have a defined light strength, we use 10.
+			let lightStrength =
+				(lightSource.lightStrength ? lightSource.lightStrength : 10) /
+				distance(x, y, lightSource.x, lightSource.y);
+
+			finalizedLightValue += lightStrength;
+		}
+
+		return finalizedLightValue;
 	}
 
 	// Get the positional bounds of the entire map.
@@ -1116,7 +1134,5 @@ let spawn = world.createRoomFromData(
 	"a"
 );
 spawn.type = "ambient";
-spawn.active = false;
-spawn.cleared = true;
 
 // world.createRoom(0, 0);

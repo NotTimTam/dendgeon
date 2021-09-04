@@ -52,6 +52,7 @@ class Player {
 
 		// Light.
 		this.lightStrength = 10;
+		world.globalLights.push(this); // Add the player to the global light sources.
 
 		// Max movement speed.
 		this.speed = 1;
