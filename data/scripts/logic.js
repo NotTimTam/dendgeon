@@ -221,10 +221,14 @@ class Tile {
 		}
 
 		try {
-			ctx.save();
-			ctx.globalAlpha =
-				player.lightStrength /
-				distance(this.x, this.y, player.x, player.y);
+			// Only apply lighting effects if the option is turned on.
+			if (renderLighting) {
+				ctx.save();
+
+				ctx.globalAlpha =
+					player.lightStrength /
+					distance(this.x, this.y, player.x, player.y);
+			}
 
 			ctx.beginPath();
 
@@ -241,7 +245,11 @@ class Tile {
 			);
 
 			ctx.closePath();
-			ctx.restore();
+
+			// We only need to restore canvas presets if the lighting is being rendered.
+			if (renderLighting) {
+				ctx.restore();
+			}
 		} catch {
 			return;
 		}
@@ -484,10 +492,14 @@ class Door extends Tile {
 		}
 
 		try {
-			ctx.save();
-			ctx.globalAlpha =
-				player.lightStrength /
-				distance(this.x, this.y, player.x, player.y);
+			// Only apply lighting effects if the option is turned on.
+			if (renderLighting) {
+				ctx.save();
+
+				ctx.globalAlpha =
+					player.lightStrength /
+					distance(this.x, this.y, player.x, player.y);
+			}
 
 			ctx.beginPath();
 
@@ -525,7 +537,11 @@ class Door extends Tile {
 				ctx.stroke();
 				ctx.closePath();
 			}
-			ctx.restore();
+
+			// We only need to restore canvas presets if the lighting is being rendered.
+			if (renderLighting) {
+				ctx.restore();
+			}
 		} catch {
 			return;
 		}

@@ -355,9 +355,6 @@ class Player {
 				this.inventory.coin > 999 ? 999 : this.inventory.coin
 			);
 		} catch {}
-
-		// Render the mini-map.
-		this.renderMiniMap(ctx);
 	}
 
 	input() {
