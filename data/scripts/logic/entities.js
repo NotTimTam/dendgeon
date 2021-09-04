@@ -36,12 +36,16 @@ class EntityManager {
 		}
 	}
 }
+let entities = new EntityManager();
 
 // An entity boilerplate.
 class Entity {
 	constructor(x, y) {
 		this.x = x;
 		this.y = y;
+
+		// Add this entity to the global parent.
+		entities.push(this);
 	}
 
 	// Placeholder rendering. Can be used to render a blank entity to show errors... Potentially.
@@ -66,6 +70,13 @@ class Torch extends Entity {
 		this.height = 8;
 		this.solid = false; // Torches can be walked through.
 	}
+
+	logic() {}
+
+	render(ctx) {
+        
+    }
 }
 
 // Debugging:
+let t = new Torch();

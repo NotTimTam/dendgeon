@@ -99,6 +99,7 @@ function renderLoop() {
 		// LOGIC. (only runs if the game isn't paused)
 		if (!paused) {
 			world.logic(); // Update the world.
+			entities.logic(); // Update the entities.
 			items.logic(); // Update the items.
 			player.logic(); // Update the player.
 		}
@@ -107,6 +108,7 @@ function renderLoop() {
 		clearCanvas();
 		world.render(ctx); // Render the world, all of its rooms and tiles.
 		items.render(ctx); // Render all the items in the game.
+		entities.render(ctx); // Render all the entities in the game.
 		player.render(ctx); // Render the player.
 		world.getRoom(player.roomPos.x, player.roomPos.y)[0].renderEnemies(ctx); // Render nearby enemies.
 
@@ -114,7 +116,7 @@ function renderLoop() {
 		if (renderUI) {
 			player.renderUI(ctx); // Render the player's UI.
 
-            // Only render the mini-map if the UI is being loaded and the settings allow it.
+			// Only render the mini-map if the UI is being loaded and the settings allow it.
 			if (renderMiniMap) {
 				player.renderMiniMap(ctx);
 			}
