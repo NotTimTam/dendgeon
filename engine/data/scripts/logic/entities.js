@@ -168,5 +168,7 @@ class Torch extends Entity {
 }
 
 // Debugging:
-let t = new Torch(8, 8, 1, true);
-console.log(t);
+new Torch(8, 8, 3, false);
+new Torch(72, 8, 3, false);
+new Torch(72, 72, 3, false);
+new Torch(8, 72, 3, false);

@@ -926,6 +926,9 @@ class World {
 			finalizedLightValue += lightStrength;
 		}
 
+		if (finalizedLightValue > 1) finalizedLightValue = 1;
+		else if (finalizedLightValue < 0) finalizedLightValue = 0;
+
 		return finalizedLightValue;
 	}
 
