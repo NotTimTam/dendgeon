@@ -970,7 +970,7 @@ class World {
 				let ray = this.castRay(
 					{ x: lightSource.x + 4, y: lightSource.y + 4 },
 					tile,
-					1
+					4
 				);
 
 				// If the ray did not hit anything before reaching the tile, than we increase that tile's global alpha.
@@ -1010,7 +1010,7 @@ class World {
 	}
 
 	// Cast a ray and see if it collides.
-	castRay(source, target, quality = 0.01) {
+	castRay(source, target, step = 1) {
 		// Create a ray object.
 		let ray = {
 			x: source.x,
@@ -1020,9 +1020,9 @@ class World {
 		};
 
 		// Keep moving and checking the ray until we reach the target.
-		while (distance(ray.x, ray.y, target.x, target.y) > quality) {
-			// Calculate the new position of the ray using a vector. We move forward the number of steps in quality. The smaller the number the more likely the ray is to hit small objects instead of moving over them.
-			let newPos = cartesian2(angle(target, ray), quality);
+		while (distance(ray.x, ray.y, target.x, target.y) > step) {
+			// Calculate the new position of the ray using a vector. We move forward the number of steps that are predefined using step. The smaller the number the more likely the ray is to hit small objects instead of moving over them.
+			let newPos = cartesian2(angle(target, ray), step);
 
 			// Move the ray.
 			ray.x += newPos.x;
@@ -1240,7 +1240,9 @@ class World {
 
 	render(ctx) {
 		// Calculate lighting.
-		this.getLighting();
+		if (renderLighting) {
+			this.getLighting();
+		}
 
 		// Render all rooms.
 		for (let room of this.rooms) {

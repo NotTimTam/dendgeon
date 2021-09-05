@@ -94,6 +94,7 @@ function drawRay(x1, y1, x2, y2, color) {
 }
 
 // Render loop.
+
 function renderLoop() {
 	// If the world hasn't finished generating, we don't render.
 	if (!world.finishedGenerating) {
@@ -144,4 +145,5 @@ function renderLoop() {
 
 	window.requestAnimationFrame(renderLoop);
 }
+
 window.requestAnimationFrame(renderLoop);
