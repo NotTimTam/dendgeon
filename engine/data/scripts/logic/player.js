@@ -532,6 +532,9 @@ class Player {
 
 				ctx.closePath();
 			}
+
+			// Cast lighting rays.
+			world.castLightingRays(this);
 		} catch {
 			return;
 		}

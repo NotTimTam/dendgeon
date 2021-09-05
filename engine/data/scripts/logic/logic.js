@@ -186,6 +186,9 @@ class Tile {
 		this.width = 8;
 		this.height = 8;
 
+		// Global alpha for lighting.
+		this.globalAlpha = 0;
+
 		// The type of tile it is... Used to grab tiledata from the tiles array. If the tile doesn't exist then we load an error tile.
 		this.type = tiles[type] === undefined ? "err" : type;
 
@@ -932,6 +935,74 @@ class World {
 		return finalizedLightValue;
 	}
 
+	// Cast all lighting rays and determine which tiles should be lit up.
+	castLightingRays(lightSource) {
+		if (!lightSource.lightStrength) {
+			// If the light source doesn not have light properties, we return.
+			return "This object does not have a lightStrength property.";
+		}
+
+		let rayArea = canvas.width / 4; // The furthest we will cast rays in any direction is half the width of the screen.
+
+		for (let tile of this.globalTiles) {
+			// Go through every tile and cast a ray to it, if it is close enough.
+			if (
+				distance(tile.x, tile.y, lightSource.x, lightSource.y) < rayArea
+			) {
+				// Cast a ray.
+				let ray = this.castRay(lightSource, tile, 1);
+				// Draw the ray. (debugging only)
+				if (ray.hit) {
+					drawRay(lightSource.x, lightSource.y, ray.x, ray.y, "red");
+				} else {
+					drawRay(
+						lightSource.x,
+						lightSource.y,
+						tile.x,
+						tile.y,
+						"green"
+					);
+				}
+			}
+		}
+	}
+
+	// Cast a ray and see if it collides.
+	castRay(source, target, quality = 0.01) {
+		// Create a ray object.
+		let ray = {
+			x: source.x,
+			y: source.y,
+			width: 1,
+			height: 1,
+		};
+
+		// Keep moving and checking the ray until we reach the target.
+		while (distance(ray.x, ray.y, target.x, target.y) > quality) {
+			// Calculate the new position of the ray using a vector. We move forward the number of steps in quality. The smaller the number the more likely the ray is to hit small objects instead of moving over them.
+			let newPos = cartesian2(angle(target, ray), quality);
+
+			// Move the ray.
+			ray.x += newPos.x;
+			ray.y += newPos.y;
+
+			// Get the ray's tile position.
+			let tilePos = worldToTile(ray.x, ray.y);
+			tilePos.x *= 8;
+			tilePos.y *= 8;
+			tilePos = this.getTile(tilePos.x, tilePos.y);
+
+			// Do a collision check.
+			if (tilePos !== undefined) {
+				if (AABB(ray, tilePos) && tilePos.data.solid) {
+					return { hit: true, x: ray.x, y: ray.y }; // Return where the ray ended. Since this is a truthy value, it is still considered a return of "true," with the added benefit of knowing where the ray landed.
+				}
+			}
+		}
+
+		return { hit: false }; // If the ray doesn't collide with anything, than we return false, meaning the cast was "successful."
+	}
+
 	// Get the positional bounds of the entire map.
 	getPositionalBounds() {
 		let positions = {
@@ -1101,7 +1172,7 @@ class World {
 	// Get a tile.
 	getTile(x, y) {
 		for (let tile of this.globalTiles) {
-			if (tile.x == x && tile.y == y) {
+			if (tile.x === x && tile.y === y) {
 				return tile;
 			}
 		}

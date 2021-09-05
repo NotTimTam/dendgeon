@@ -49,6 +49,7 @@ const nums = new Sheet("spritesheet_nums", {
 	9: { x: 9, y: 0 },
 });
 
+// Render a string of numbers on the screen using pixel art.
 function renderNumber(x, y, number) {
 	x = Math.round(x);
 	y = Math.round(y);
@@ -72,6 +73,24 @@ function renderNumber(x, y, number) {
 
 		ctx.closePath();
 	}
+}
+
+// Render a ray.
+function drawRay(x1, y1, x2, y2, color) {
+	ctx.save();
+	ctx.beginPath();
+
+	ctx.globalAlpha = 0.2;
+
+	ctx.strokeStyle = color;
+	ctx.lineWidth = 1;
+
+	ctx.moveTo(x1 - player.camera.x, y1 - player.camera.y);
+	ctx.lineTo(x2 - player.camera.x, y2 - player.camera.y);
+
+	ctx.stroke();
+	ctx.closePath();
+	ctx.restore();
 }
 
 // Render loop.
