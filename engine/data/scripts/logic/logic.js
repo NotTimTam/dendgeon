@@ -719,6 +719,12 @@ class Room {
 					false
 				);
 			}
+
+			// Create torches.
+			new Torch(this.x + 8, this.y + 8, 3, true);
+			new Torch(this.x + 72, this.y + 8, 3, true);
+			new Torch(this.x + 72, this.y + 72, 3, true);
+			new Torch(this.x + 8, this.y + 72, 3, true);
 		}
 	}
 
@@ -967,11 +973,7 @@ class World {
 				distance(tile.x, tile.y, lightSource.x, lightSource.y) < rayArea
 			) {
 				// Cast a ray.
-				let ray = this.castRay(
-					{ x: lightSource.x + 4, y: lightSource.y + 4 },
-					tile,
-					4
-				);
+				let ray = this.castRay(lightSource, tile, 4);
 
 				// If the ray did not hit anything before reaching the tile, than we increase that tile's global alpha.
 				if (!ray.hit) {
@@ -983,10 +985,12 @@ class World {
 						distance(tile.x, tile.y, lightSource.x, lightSource.y);
 
 					tile.globalAlpha += lightStrength;
+
+					if (tile.globalAlpha < 0.1) tile.globalAlpha = 0.1;
 				}
 
 				// Draw the ray. (debugging only)
-				if (debugging) {
+				if (debugging && showRays) {
 					if (ray.hit) {
 						drawRay(
 							lightSource.x + 4,
@@ -1013,8 +1017,8 @@ class World {
 	castRay(source, target, step = 1) {
 		// Create a ray object.
 		let ray = {
-			x: source.x,
-			y: source.y,
+			x: source.x + 4,
+			y: source.y + 4,
 			width: 1,
 			height: 1,
 		};
@@ -1036,7 +1040,11 @@ class World {
 
 			// Do a collision check.
 			if (tilePos !== undefined) {
-				if (AABB(ray, tilePos) && tilePos.data.solid) {
+				if (
+					AABB(ray, tilePos) &&
+					tilePos.data.solid &&
+					distance(ray.x, ray.y, tilePos.x + 4, tilePos.y + 4) <= 5
+				) {
 					// Check if the tile we are aiming for is solid, and we are potentially ignoring it.
 					if (
 						tilePos.data.solid &&

@@ -52,7 +52,7 @@ class Player {
 
 		// Light.
 		this.lightStrength = 10;
-		this.lightDistance = 128 / 2;
+		this.lightDistance = 72;
 		world.globalLights.push(this); // Add the player to the global light sources.
 
 		// Max movement speed.

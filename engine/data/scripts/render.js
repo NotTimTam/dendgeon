@@ -77,10 +77,7 @@ function renderNumber(x, y, number) {
 
 // Render a ray.
 function drawRay(x1, y1, x2, y2, color) {
-	ctx.save();
 	ctx.beginPath();
-
-	ctx.globalAlpha = 0.2;
 
 	ctx.strokeStyle = color;
 	ctx.lineWidth = 1;
@@ -90,7 +87,6 @@ function drawRay(x1, y1, x2, y2, color) {
 
 	ctx.stroke();
 	ctx.closePath();
-	ctx.restore();
 }
 
 // Render loop.
