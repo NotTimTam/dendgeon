@@ -11,3 +11,4 @@ let renderLighting = true;
 
 // Engine Settings
 let paused = false;
+let debugging = false;

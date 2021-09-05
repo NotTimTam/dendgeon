@@ -52,6 +52,7 @@ class Player {
 
 		// Light.
 		this.lightStrength = 10;
+		this.lightDistance = 128 / 2;
 		world.globalLights.push(this); // Add the player to the global light sources.
 
 		// Max movement speed.
@@ -445,6 +446,7 @@ class Player {
 		this.camera.x = Math.round(this.camera.x);
 		this.camera.y = Math.round(this.camera.y);
 
+		// Animate
 		this.animate();
 	}
 
@@ -532,9 +534,6 @@ class Player {
 
 				ctx.closePath();
 			}
-
-			// Cast lighting rays.
-			world.castLightingRays(this);
 		} catch {
 			return;
 		}

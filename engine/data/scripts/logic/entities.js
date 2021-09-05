@@ -61,6 +61,7 @@ class Torch extends Entity {
 		// Lighting data.
 		this.initLightStrength = lightStrength; // STore the initial light strength value.
 		this.lightStrength = lightStrength; // The strength of the light this torch emits.
+		this.lightDistance = 128 / 8;
 		this.lightPulses = lightPulses; // Wether or not the light strength of the torch changes slightly to look like a flame growing and shrinking.
 
 		// Add this to the global light sources so its light is applied to tiles.
@@ -168,7 +169,7 @@ class Torch extends Entity {
 }
 
 // Debugging:
-// new Torch(8, 8, 3, false);
-// new Torch(72, 8, 3, false);
-// new Torch(72, 72, 3, false);
-// new Torch(8, 72, 3, false);
+new Torch(8, 8, 3, false);
+new Torch(72, 8, 3, false);
+new Torch(72, 72, 3, false);
+new Torch(8, 72, 3, false);

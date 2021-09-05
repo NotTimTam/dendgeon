@@ -215,7 +215,10 @@ class Tile {
 		return true;
 	}
 
-	logic() {}
+	logic() {
+		// Reset the globalAlpha of the tile each logic loop.
+		this.globalAlpha = 0;
+	}
 
 	render(ctx) {
 		// If the tile is not on-screen, we don't render it.
@@ -229,7 +232,7 @@ class Tile {
 				ctx.save();
 
 				// Get and apply the lighting data for this tile.
-				ctx.globalAlpha = world.getLightingData(this.x, this.y);
+				ctx.globalAlpha = this.globalAlpha;
 			}
 
 			ctx.beginPath();
@@ -466,6 +469,9 @@ class Door extends Tile {
 	}
 
 	logic() {
+		// Reset the globalAlpha of the tile each logic loop.
+		this.globalAlpha = 0;
+
 		// Determine if the door should be open or closed.
 		if (this.open) {
 			this.data = tiles.door_open;
@@ -499,7 +505,7 @@ class Door extends Tile {
 				ctx.save();
 
 				// Get and apply the lighting data for this tile.
-				ctx.globalAlpha = world.getLightingData(this.x, this.y);
+				ctx.globalAlpha = this.globalAlpha;
 			}
 
 			ctx.beginPath();
@@ -915,24 +921,33 @@ class World {
 		this.positionalBounds = {}; // A place to store positional bounds after the world has been generated.
 	}
 
+	// OLD LIGHTING CODE.
 	// Calculates the lighting of a tile based on light sources around it.
-	getLightingData(x, y) {
-		// Loop through all the lights and calculate the lighting values. This is done by getting the average of all light applied to the tile.
-		let finalizedLightValue = 0;
+	// getLightingData(x, y) {
+	// 	// Loop through all the lights and calculate the lighting values. This is done by getting the average of all light applied to the tile.
+	// 	let finalizedLightValue = 0;
 
+	// 	for (let lightSource of this.globalLights) {
+	// 		// Calculate the strength of the light on the tile. If the light source doesn't have a defined light strength, we use 10.
+	// 		let lightStrength =
+	// 			(lightSource.lightStrength ? lightSource.lightStrength : 10) /
+	// 			distance(x, y, lightSource.x, lightSource.y);
+
+	// 		finalizedLightValue += lightStrength;
+	// 	}
+
+	// 	if (finalizedLightValue > 1) finalizedLightValue = 1;
+	// 	else if (finalizedLightValue < 0) finalizedLightValue = 0;
+
+	// 	return finalizedLightValue;
+	// }
+
+	// Cast rays and calculate lighting for all globalLights.
+	getLighting() {
 		for (let lightSource of this.globalLights) {
-			// Calculate the strength of the light on the tile. If the light source doesn't have a defined light strength, we use 10.
-			let lightStrength =
-				(lightSource.lightStrength ? lightSource.lightStrength : 10) /
-				distance(x, y, lightSource.x, lightSource.y);
-
-			finalizedLightValue += lightStrength;
+			// Cast lighting rays.
+			this.castLightingRays(lightSource);
 		}
-
-		if (finalizedLightValue > 1) finalizedLightValue = 1;
-		else if (finalizedLightValue < 0) finalizedLightValue = 0;
-
-		return finalizedLightValue;
 	}
 
 	// Cast all lighting rays and determine which tiles should be lit up.
@@ -942,7 +957,9 @@ class World {
 			return "This object does not have a lightStrength property.";
 		}
 
-		let rayArea = canvas.width / 4; // The furthest we will cast rays in any direction is half the width of the screen.
+		let rayArea = lightSource.lightDistance
+			? lightSource.lightDistance
+			: canvas.width / 2; // The furthest we will cast rays in any direction is half the width of the screen, unless the light source has its own distance value.
 
 		for (let tile of this.globalTiles) {
 			// Go through every tile and cast a ray to it, if it is close enough.
@@ -950,18 +967,43 @@ class World {
 				distance(tile.x, tile.y, lightSource.x, lightSource.y) < rayArea
 			) {
 				// Cast a ray.
-				let ray = this.castRay(lightSource, tile, 1);
+				let ray = this.castRay(
+					{ x: lightSource.x + 4, y: lightSource.y + 4 },
+					tile,
+					1
+				);
+
+				// If the ray did not hit anything before reaching the tile, than we increase that tile's global alpha.
+				if (!ray.hit) {
+					// Calculate the strength of the light on the tile. If the light source doesn't have a defined light strength, we use 10.
+					let lightStrength =
+						(lightSource.lightStrength
+							? lightSource.lightStrength
+							: 10) /
+						distance(tile.x, tile.y, lightSource.x, lightSource.y);
+
+					tile.globalAlpha += lightStrength;
+				}
+
 				// Draw the ray. (debugging only)
-				if (ray.hit) {
-					drawRay(lightSource.x, lightSource.y, ray.x, ray.y, "red");
-				} else {
-					drawRay(
-						lightSource.x,
-						lightSource.y,
-						tile.x,
-						tile.y,
-						"green"
-					);
+				if (debugging) {
+					if (ray.hit) {
+						drawRay(
+							lightSource.x + 4,
+							lightSource.y + 4,
+							ray.x,
+							ray.y,
+							"red"
+						);
+					} else {
+						drawRay(
+							lightSource.x + 4,
+							lightSource.y + 4,
+							tile.x,
+							tile.y,
+							"green"
+						);
+					}
 				}
 			}
 		}
@@ -995,6 +1037,15 @@ class World {
 			// Do a collision check.
 			if (tilePos !== undefined) {
 				if (AABB(ray, tilePos) && tilePos.data.solid) {
+					// Check if the tile we are aiming for is solid, and we are potentially ignoring it.
+					if (
+						tilePos.data.solid &&
+						target.data.solid &&
+						tilePos === target
+					) {
+						return { hit: false };
+					}
+
 					return { hit: true, x: ray.x, y: ray.y }; // Return where the ray ended. Since this is a truthy value, it is still considered a return of "true," with the added benefit of knowing where the ray landed.
 				}
 			}
@@ -1188,6 +1239,9 @@ class World {
 	}
 
 	render(ctx) {
+		// Calculate lighting.
+		this.getLighting();
+
 		// Render all rooms.
 		for (let room of this.rooms) {
 			room.render(ctx);
