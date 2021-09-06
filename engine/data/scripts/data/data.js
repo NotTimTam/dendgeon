@@ -24,6 +24,7 @@ const tiles = {
 		id: 0,
 	},
 
+	// GROUND
 	ground_1: {
 		solid: false,
 
@@ -86,7 +87,28 @@ const tiles = {
 
 		id: 4,
 	},
+	back_wall_1: {
+		solid: false,
 
+		pos: {
+			x: 4,
+			y: 0,
+		},
+
+		id: 8,
+	},
+	back_wall_2: {
+		solid: false,
+
+		pos: {
+			x: 5,
+			y: 0,
+		},
+
+		id: 9,
+	},
+
+	// DOORS
 	door_closed: {
 		solid: true,
 
@@ -110,7 +132,7 @@ tiles.load();
 const rooms = {
 	a: [
 		[3, 4, 4, 4, 4, 6, 4, 4, 4, 4, 3],
-		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
+		[3, , 1, 1, 1, 1, 1, 1, 1, 1, 3],
 		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
 		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],
 		[3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3],

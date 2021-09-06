@@ -113,3 +113,4 @@ By building the crawler out as a full game, I am able to implement features that
 -   Chest room.
 -   More kinds of loot.
 -   Enemy drops.
+-   Old fashioned cheat-codes. (button mashing (O < O) )
