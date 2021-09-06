@@ -47,9 +47,9 @@ There isn't official documentation yet, but everything is thoroughly commented a
 
 #### Noteable Small Features
 
--   Raycasting.
--   A fully posable camera with smart rendering. (only what is on-screen, is rendered)
--   Fully customizable item system.
+-   Raycasting/tracing.
+-   A fully posable camera with smart rendering. (only renders what is on-screen)
+-   Fully customizable item/loot system.
 -   Fully customizable entity system.
 
 ### Roadmap of Potential Features
