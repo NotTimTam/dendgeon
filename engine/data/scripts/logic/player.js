@@ -75,6 +75,33 @@ class Player {
 			y: 0,
 			desX: 0, // The position the camera is smoothly moving towards.
 			desY: 0,
+			shake: (duration, strength) => {
+				this.camera.shakeDuration = duration;
+				this.camera.shakeStrength = strength;
+				this.camera.shaking = true;
+				this.camera.shakeStoredPos = {
+					x: this.camera.x,
+					y: this.camera.y,
+				};
+			},
+			_shakeFrame: () => {
+				// Shake the screen.
+				this.camera.x += randRange(
+					-this.camera.shakeStrength,
+					this.camera.shakeStrength
+				);
+				this.camera.y += randRange(
+					-this.camera.shakeStrength,
+					this.camera.shakeStrength
+				);
+
+				this.camera.shakeDuration--;
+
+				if (this.camera.shakeDuration <= 0 || !this.camera.shaking) {
+					this.camera.shaking = false;
+					return;
+				}
+			},
 		};
 
 		// Player inventory.
@@ -422,6 +449,11 @@ class Player {
 
 		this.camera.x = Math.round(this.camera.x);
 		this.camera.y = Math.round(this.camera.y);
+
+		// Animate the camera shaking.
+		if (this.camera.shaking === true) {
+			this.camera._shakeFrame();
+		}
 
 		// Animate
 		this.animate();

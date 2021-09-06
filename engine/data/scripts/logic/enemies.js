@@ -51,8 +51,20 @@ class Enemy {
 		// enemy stats.
 		this.health = health;
 		this.maxHealth = health;
-		this.damage = 1;
+		this.damage = 0.5;
+		this.attackFrequency = 150; // How often the enemy can hit the player.
+		this.lastAttack = 999;
 		this.gotHit = 0; // How long to display that the enemy got hit.
+	}
+
+	// Handle attacking.
+	attack() {
+		if (this.lastAttack >= this.attackFrequency) {
+			player.camera.shake(5, 1);
+			player.inventory.health -= this.damage;
+
+			this.lastAttack = 0;
+		}
 	}
 
 	// Handle animations
@@ -112,6 +124,12 @@ class Enemy {
 				this.dir = 3;
 			}
 		}
+
+		// Handle attacking.
+		if (AABB(this, player)) {
+			this.attack();
+		}
+		this.lastAttack++;
 
 		// Set the enemies animation direction.
 		if (player.x > this.x) {

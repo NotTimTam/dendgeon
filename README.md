@@ -1,4 +1,4 @@
-﻿# Dendgeon V. 0.3.4
+﻿# Dendgeon V. 0.3.5
 
 <sub><sup>Get it? It's a play on words of dungeon and engine... 😐</sup></sub>
 
@@ -52,6 +52,46 @@ There isn't official documentation yet, but everything is thoroughly commented a
 -   Fully customizable item/loot system.
 -   Fully customizable entity system.
 
+### Changelog
+
+#### V.0.3.5
+
+-   Added camera shaking.
+-   Gave enemies the ability to attack the player at intervals.
+
+#### V.0.3.4
+
+-   Made animation functionality a global class for less repetative code.
+-   Fixed bug where some game objects would have their render code run while they were on-screen.
+
+#### V.0.3.3
+
+-   Added raycasted lighting.
+
+#### V.0.3.1
+
+-   Added multiple light sources.
+
+#### V.0.2
+
+-   Added room generation.
+-   Changed room textures.
+-   Improved rendering efficiency.
+-   Added simple player-focused "lighting."
+-   Added enemies.
+-   Added perlin noise to improve room randomness.
+
+#### V.0.1
+
+-   Began file layout and imported common canvas properties.
+-   Added a player object and rooms with tiles.
+-   Added a collision system.
+-   Added player animation control.
+-   Added textures.
+-   Added player animations.
+-   Added items.
+-   Added collisions.
+
 ### Roadmap of Potential Features
 
 By building the crawler out as a full game, I am able to implement features that are useful for people building their own game in the engine. Here are just a few of the big things I plan on adding:
@@ -63,10 +103,8 @@ By building the crawler out as a full game, I am able to implement features that
 -   A boss room.
 -   Better collision system that is global-focused rather than object-focused and more efficient.
 -   Player dying/respawning.
--   ~~Raycast lighting.~~ (ADDED V.0.3.3)
 -   Sound effects.
 -   Move all spritesheets to new spritesheet loading system.
--   ~~Add global animation functions.~~ (ADDED V.0.3.4)
 -   Doom-like 3D rendering with raycasting.
 -   Chest room.
 -   More kinds of loot.
