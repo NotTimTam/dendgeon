@@ -53,27 +53,28 @@ There isn't official documentation yet, but everything is thoroughly commented a
 -   Fully customizable entity system.
 
 ### Changelog
+
 Newest changes on top. Once a major version change is completed all of its sub-version changes are compiled under one heading.
 
-#### V.0.3.5
+#### V.0.3.5 - 2021-9-5
 
 -   Added camera shaking.
 -   Gave enemies the ability to attack the player at intervals.
 
-#### V.0.3.4
+#### V.0.3.4 - 2021-9-5
 
 -   Made animation functionality a global class for less repetative code.
 -   Fixed bug where some game objects would have their render code run while they were on-screen.
 
-#### V.0.3.3
+#### V.0.3.3 - 2021-9-4
 
 -   Added raycasted lighting.
 
-#### V.0.3.1
+#### V.0.3.1 - 2021-9-4
 
 -   Added multiple light sources.
 
-#### V.0.2
+#### V.0.2 - 2021-9-2
 
 -   Added room generation.
 -   Changed room textures.
@@ -81,8 +82,9 @@ Newest changes on top. Once a major version change is completed all of its sub-v
 -   Added simple player-focused "lighting."
 -   Added enemies.
 -   Added perlin noise to improve room randomness.
+-   Removed projectiles.
 
-#### V.0.1
+#### V.0.1 - 2021-8-22
 
 -   Began file layout and imported common canvas properties.
 -   Added a player object and rooms with tiles.
@@ -92,6 +94,7 @@ Newest changes on top. Once a major version change is completed all of its sub-v
 -   Added player animations.
 -   Added items.
 -   Added collisions.
+-   Added projectiles.
 
 ### Roadmap of Potential Features
 
