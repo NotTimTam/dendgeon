@@ -7,6 +7,7 @@
 ## About
 
 ![V 0.3 in-engine screenshot](./repo/v0.3.3_scr_1.png)
+
 <em>An in-engine screenshot from version 0.3.3.</em>
 
 Did somebody say "lightweight, retro-themed, easy-to-understand, easier-to-learn, dungeon crawler engine"?
