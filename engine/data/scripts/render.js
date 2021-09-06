@@ -51,6 +51,9 @@ const nums = new Sheet("spritesheet_nums", {
 
 // Render a string of numbers on the screen using pixel art.
 function renderNumber(x, y, number) {
+	// Check that the number sheet has loaded.
+	if (!nums.loaded) return;
+
 	x = Math.round(x);
 	y = Math.round(y);
 
