@@ -50,18 +50,21 @@ class Entity {
 
 	// Placeholder rendering. Can be used to render a blank entity to show errors... Potentially.
 	logic() {}
-	render(ctx) {}
+	render(ctx) {
+		// Check if the entity is on screen.
+		if (!isOnScreen(this)) return;
+	}
 }
 
 // A torch object.
 class Torch extends Entity {
-	constructor(x, y, lightStrength = 10, lightPulses = true) {
+	constructor(x, y, lightPulses = true) {
 		super(x, y); // Do regular entity stuff.
 
 		// Lighting data.
-		this.initLightStrength = lightStrength; // STore the initial light strength value.
-		this.lightStrength = lightStrength; // The strength of the light this torch emits.
-		this.lightDistance = 128 / 8;
+		this.initLightStrength = randRange(6, 10); // STore the initial light strength value.
+		this.lightStrength = this.initLightStrength; // The strength of the light this torch emits.
+		this.lightDistance = randRange(24, 32);
 		this.lightPulses = lightPulses; // Wether or not the light strength of the torch changes slightly to look like a flame growing and shrinking.
 
 		// Add this to the global light sources so its light is applied to tiles.
@@ -70,7 +73,7 @@ class Torch extends Entity {
 		// Collisions data.
 		this.width = 8;
 		this.height = 8;
-		this.solid = false; // Torches can be walked through.
+		this.solid = true; // Torches can be walked through.
 
 		// Animation data.
 		this.animationMap = new Sheet("spritesheet_torch");
@@ -133,6 +136,9 @@ class Torch extends Entity {
 	}
 
 	logic() {
+		// Check if the entity is on screen. (since the only logic performed is for animation, it isn't necessary off-screen)
+		if (!isOnScreen(this)) return;
+
 		// Run animations.
 		this.animate();
 
@@ -145,6 +151,9 @@ class Torch extends Entity {
 	}
 
 	render(ctx) {
+		// Check if the entity is on screen.
+		if (!isOnScreen(this)) return;
+
 		// We attempt to render. The only reason this would fail is if the spritesheet hasn't loaded yet. Which for the first few frames after the engine starts, it hasn't.
 		try {
 			ctx.beginPath();

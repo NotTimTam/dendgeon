@@ -195,6 +195,9 @@ class Enemy {
 	}
 
 	render(ctx) {
+		// Check if the enemy is on screen.
+		if (!isOnScreen(this)) return;
+
 		try {
 			// Render enemy.
 			ctx.beginPath();

@@ -228,6 +228,7 @@ class Player {
 				break;
 		}
 
+		// CHECK COLLISIONS AGAINST TILES.
 		// Get the the actual tile from the global tile array.
 		this.goalTile = world.getTile(
 			Math.round(this.goalTile.x * 8),
@@ -250,6 +251,22 @@ class Player {
 				}
 			} else {
 				continue;
+			}
+		}
+
+		// CHECK COLLISIONS AGAINST ENTITIES.
+		for (let entity of entities.entities) {
+			// If the entity is too far away, we don't even bother checking.
+			if (
+				distance(entity.x, entity.y, hbb.x, hbb.y) >
+				hbb.width + hbb.height + entity.width + entity.height + 2
+			) {
+				continue;
+			}
+
+			// Check collisions.
+			if (AABB(entity, hbb) && entity.solid) {
+				return true;
 			}
 		}
 
@@ -451,6 +468,9 @@ class Player {
 	}
 
 	render(ctx) {
+		// Check that the player is on-screen.
+		if (!isOnScreen(this)) return;
+
 		try {
 			ctx.beginPath();
 

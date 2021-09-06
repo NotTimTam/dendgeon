@@ -89,6 +89,9 @@ class Item {
 
 	// Render this item.
 	render(ctx) {
+		// Check if the item is on screen.
+		if (!isOnScreen(this)) return;
+
 		try {
 			ctx.beginPath();
 
@@ -162,6 +165,9 @@ class ItemManager {
 
 		// Run game logic for all items.
 		for (let item of this.items) {
+			// Check if the item is on screen.
+			if (!isOnScreen(item)) continue;
+
 			item.logic();
 		}
 	}
@@ -169,6 +175,9 @@ class ItemManager {
 	render(ctx) {
 		// Render all items.
 		for (let item of this.items) {
+			// Check if the item is on screen.
+			if (!isOnScreen(item)) continue;
+
 			item.render(ctx);
 		}
 	}
@@ -195,26 +204,6 @@ class Tile {
 		this.data = tiles[this.type];
 	}
 
-	// Check wether or not this tile is currently on-screen.
-	onScreen() {
-		// Check x's.
-		if (this.x + 8 < player.camera.x) {
-			return false;
-		} else if (this.x > player.camera.x + canvas.width) {
-			return false;
-		}
-
-		// Check y's.
-		if (this.y + 8 < player.camera.y) {
-			return false;
-		} else if (this.y > player.camera.y + canvas.height) {
-			return false;
-		}
-
-		// Otherwise return "true". (i.e. it is on screen)
-		return true;
-	}
-
 	logic() {
 		// Reset the globalAlpha of the tile each logic loop.
 		this.globalAlpha = 0;
@@ -222,9 +211,7 @@ class Tile {
 
 	render(ctx) {
 		// If the tile is not on-screen, we don't render it.
-		if (!this.onScreen()) {
-			return;
-		}
+		if (!isOnScreen(this)) return;
 
 		try {
 			// Only apply lighting effects if the option is turned on.
@@ -234,7 +221,7 @@ class Tile {
 				// Get and apply the lighting data for this tile.
 				ctx.globalAlpha = this.globalAlpha;
 			}
-
+            
 			ctx.beginPath();
 
 			ctx.drawImage(
@@ -448,26 +435,6 @@ class Door extends Tile {
 	// 	);
 	// }
 
-	// Check wether or not this tile is currently on-screen.
-	onScreen() {
-		// Check x's.
-		if (this.x + 8 < player.camera.x) {
-			return false;
-		} else if (this.x > player.camera.x + canvas.width) {
-			return false;
-		}
-
-		// Check y's.
-		if (this.y + 8 < player.camera.y) {
-			return false;
-		} else if (this.y > player.camera.y + canvas.height) {
-			return false;
-		}
-
-		// Otherwise return "true". (i.e. it is on screen)
-		return true;
-	}
-
 	logic() {
 		// Reset the globalAlpha of the tile each logic loop.
 		this.globalAlpha = 0;
@@ -495,9 +462,7 @@ class Door extends Tile {
 
 	render(ctx) {
 		// If the tile is not on-screen, we don't render it.
-		if (!this.onScreen()) {
-			return;
-		}
+		if (!isOnScreen(this)) return;
 
 		try {
 			// Only apply lighting effects if the option is turned on.
@@ -721,10 +686,10 @@ class Room {
 			}
 
 			// Create torches.
-			new Torch(this.x + 8, this.y + 8, 3, true);
-			new Torch(this.x + 72, this.y + 8, 3, true);
-			new Torch(this.x + 72, this.y + 72, 3, true);
-			new Torch(this.x + 8, this.y + 72, 3, true);
+			new Torch(this.x + 8, this.y + 8, true);
+			new Torch(this.x + 72, this.y + 8, true);
+			new Torch(this.x + 72, this.y + 72, true);
+			new Torch(this.x + 8, this.y + 72, true);
 		}
 	}
 
@@ -863,6 +828,8 @@ class Room {
 		// Render all enemies in the room.
 		if (this.type === "hostile" && this.enemyCache.length > 0) {
 			for (let enemy of this.enemyCache) {
+				// Check if the enemy is on screen.
+				if (!isOnScreen(enemy)) continue;
 				enemy.render(ctx);
 			}
 		}
@@ -903,6 +870,9 @@ class Room {
 
 		// Render all tiles.
 		for (let tile of this.tiles) {
+			// Check if the tile is on screen.
+			if (!isOnScreen(tile)) continue;
+
 			tile.render(ctx);
 		}
 
@@ -968,6 +938,9 @@ class World {
 			: canvas.width / 2; // The furthest we will cast rays in any direction is half the width of the screen, unless the light source has its own distance value.
 
 		for (let tile of this.globalTiles) {
+			// Check if the tile is on screen.
+			if (!isOnScreen(tile)) continue;
+
 			// Go through every tile and cast a ray to it, if it is close enough.
 			if (
 				distance(tile.x, tile.y, lightSource.x, lightSource.y) < rayArea

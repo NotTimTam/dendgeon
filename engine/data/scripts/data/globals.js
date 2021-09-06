@@ -1,12 +1,14 @@
 "use strict";
 
 // Global functions.
+
 const worldToTile = (x, y) => {
 	return {
 		x: Math.round(x / 8 - 0.5),
 		y: Math.round(y / 8 - 0.5),
 	};
 };
+
 const worldToRoom = (x, y) => {
 	return {
 		x: Math.round(x / 88 - 0.5) * 88,
@@ -25,6 +27,22 @@ const AABB = (rect1, rect2) => {
 	} else {
 		return false;
 	}
+};
+
+const isOnScreen = (object) => {
+	if (object.x + object.width < player.camera.x) {
+		return false;
+	} else if (object.x > player.camera.x + canvas.width) {
+		return false;
+	}
+
+	if (object.y + object.height < player.camera.y) {
+		return false;
+	} else if (object.y > player.camera.y + canvas.height) {
+		return false;
+	}
+
+	return true;
 };
 
 const angle = (object1, object2) => {
