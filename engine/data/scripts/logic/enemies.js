@@ -9,29 +9,18 @@ also are rendered above other entities, just like the player.
 // Enemies.
 class Enemy {
 	constructor(x, y, origin, health = 1) {
-		// Load the enemie's spritesheet.
-		this.load_spritesheet();
-
 		// Animation handling.
-		this.animation = {
-			map: undefined,
-			name: "move", // The name of the current animation.
-			frame: 0, // The frame of the current animation.
-			speed: 16, // The speed of the current animation.
-			direction: 0, // The direction the animation should be facing.
-			tick: 0, // The current position in the frame.
-			frameCounts: {
-				// How many frames are in each animation, and at what frame they start.
-				move: {
-					start: 0,
-					end: 1,
-				},
-				hit: {
-					start: 2,
-					end: 3,
-				},
+		this.animation = new Anim("spritesheet_enemy", "move", 0, 16, {
+			// How many frames are in each animation, and at what frame they start.
+			move: {
+				start: 0,
+				end: 1,
 			},
-		};
+			hit: {
+				start: 2,
+				end: 3,
+			},
+		});
 
 		// The room the enemy spawned in.
 		this.origin = origin;
@@ -66,20 +55,8 @@ class Enemy {
 		this.gotHit = 0; // How long to display that the enemy got hit.
 	}
 
-	// Load the image source for the spritesheet. Should be done before any rendering is attempted. But the rendering is given a try catch since JS is asynchronous.
-	load_spritesheet() {
-		let img = new Image();
-		img.onload = () => {
-			this.animation.map = img;
-		};
-		img.src = "./data/images/spritesheet_enemy.png";
-	}
-
 	// Handle animations
 	animate() {
-		// Update animation steps.
-		this.animation.tick++; // Add to the tick.
-
 		// If we've been hit recently
 		if (this.gotHit > 0) {
 			this.animation.name = "hit";
@@ -87,25 +64,8 @@ class Enemy {
 			this.animation.name = "move";
 		}
 
-		// Move to the next frame if the speed/tick counter completes.
-		if (this.animation.tick > this.animation.speed) {
-			this.animation.tick = 0;
-			this.animation.frame++;
-		}
-
-		// If we have finished an animation, restart it.
-		if (
-			this.animation.frame >
-			this.animation.frameCounts[this.animation.name].end
-		) {
-			// BREAKDOWN:
-			/*  
-                where the data for framecounts is stored      the name of the currently playing animation       the frame start or end position of the animation.
-                this.animation.frameCounts                    [this.animation.name]                             start/end
-            */
-			this.animation.frame =
-				this.animation.frameCounts[this.animation.name].start;
-		}
+		// Run the animation.
+		this.animation.animate();
 	}
 
 	logic() {

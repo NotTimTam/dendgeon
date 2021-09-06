@@ -1,5 +1,106 @@
 "use strict";
 
+// Global Objects.
+
+// Tilemaps and Spritesheets.
+class Sheet {
+	constructor(src, locs) {
+		this.loaded = false;
+		this.src = src;
+		this.map = undefined;
+		this.locs = locs;
+
+		this.load();
+	}
+
+	load = () => {
+		let img = new Image();
+		img.onload = () => {
+			this.map = img;
+			this.loaded = true;
+		};
+		img.src = `./data/images/${this.src}.png`;
+	};
+}
+
+// Spritestrips for animation. (should be one frame high)
+class Anim {
+	constructor(
+		src,
+		firstAnim = "animation1",
+		startingFrame = 0,
+		speed = 4,
+		frameCounts = {
+			// How many frames are in each animation, and at what frame they start.
+			animation1: {
+				start: 0,
+				end: 3,
+			},
+		},
+		onFinish,
+		extraProps
+	) {
+		// Animation strip data.
+		this.loaded = false;
+		this.src = src;
+		this.map = undefined;
+		this.load();
+
+		// Animation data.
+		this.name = firstAnim; // The name of the current animation.
+		this.frame = startingFrame; // The frame of the current animation.
+		this.speed = speed; // The speed of the current animation. (the lower the number, the faster the animation)
+		this.tick = 0; // The current position in the frame.
+		this.frameCounts = frameCounts;
+		this.onFinish = onFinish; // A function to run when an animation finishes.
+
+		// Load extra props.
+		for (let prop in extraProps) {
+			this[prop] = extraProps[prop];
+		}
+	}
+
+	// Load the sprite strip.
+	load = () => {
+		let img = new Image();
+		img.onload = () => {
+			this.map = img;
+			this.loaded = true;
+		};
+		img.src = `./data/images/${this.src}.png`;
+	};
+
+	// Handle animations
+	animate = () => {
+		// Check if the image for the animation has loaded yet.
+		if (!this.loaded) return;
+
+		// Update animation steps.
+		this.tick++; // Add to the tick.
+
+		// Move to the next frame if the speed/tick counter completes.
+		if (this.tick > this.speed) {
+			this.tick = 0;
+			this.frame++;
+		}
+
+		// If we have finished an animation, restart it.
+		if (this.frame > this.frameCounts[this.name].end) {
+			// BREAKDOWN:
+			/*  
+                where the data for framecounts is stored      the name of the currently playing animation       the frame start or end position of the animation.
+                this.frameCounts                              [this.name]                                       start/end
+            */
+			this.frame = this.frameCounts[this.name].start;
+
+			// If the animation has a defined onFinish function, we run it. (the animation needs to be passed through)
+			if (this.onFinish !== undefined) {
+				this.onFinish(this);
+			}
+		}
+	};
+}
+
 // Global functions.
 
 const worldToTile = (x, y) => {

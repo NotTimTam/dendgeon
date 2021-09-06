@@ -1,4 +1,4 @@
-﻿# Dendgeon V. 0.3.3
+﻿# Dendgeon V. 0.3.4
 
 <sub><sup>Get it? It's a play on words of dungeon and engine... 😐</sup></sub>
 
@@ -62,7 +62,7 @@ By building the crawler out as a full game, I am able to implement features that
 -   A boss room.
 -   Better collision system that is global-focused rather than object-focused and more efficient.
 -   Player dying/respawning.
--   Raycast lighting. (ADDED V.0.3.3)
+-   ~~Raycast lighting.~~ (ADDED V.0.3.3)
 -   Sound effects.
 -   Move all spritesheets to new spritesheet loading system.
--   Add global animation functions.
+-   ~~Add global animation functions.~~ (ADDED V.0.3.3)

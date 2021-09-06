@@ -3,9 +3,6 @@
 // Player.
 class Player {
 	constructor(x, y) {
-		// Load the player's spritesheet.
-		this.load_spritesheet();
-
 		// Load the UI spritesheet.
 		this.ui = new Sheet("spritesheet_ui", {
 			heart: { x: 0, y: 0 },
@@ -13,15 +10,12 @@ class Player {
 		});
 
 		// Animation handling.
-		this.animation = {
-			map: undefined,
-			name: "stand", // The name of the current animation.
-			frame: 0, // The frame of the current animation.
-			speed: 0, // The speed of the current animation.
-			overallSpeed: 4, // The top speed of an animation, calculated with the current speed of the player in mind. (lower numbers are faster)
-			direction: 0, // The direction the animation should be facing.
-			tick: 0, // The current position in the frame.
-			frameCounts: {
+		this.animation = new Anim(
+			"spritesheet_player",
+			"stand",
+			0,
+			0,
+			{
 				// How many frames are in each animation, and at what frame they start.
 				stand: {
 					start: 0,
@@ -32,7 +26,11 @@ class Player {
 					end: 3,
 				},
 			},
-		};
+			undefined,
+			{
+				overallSpeed: 4, // How fast the animation moves in coorelation to the player speed.
+			}
+		);
 
 		// The player's position on-screen/in-game.
 		this.x = x;
@@ -86,44 +84,38 @@ class Player {
 		};
 
 		// Player attack.
-		this.attackAnimation = {
-			attacking: false,
-			map: undefined,
-			frame: 0, // The frame of the animation.
-			speed: 0, // The speed of the current animation.
-			direction: 0, // The direction the animation should be facing.
-			tick: 0, // The current position in the frame.
-			endFrame: 6,
-			hitbox: {
-				x: 0,
-				y: 0,
-				width: 0,
-				height: 0,
+		this.attackAnimation = new Anim(
+			"spritesheet_player_attack",
+			"swing",
+			0,
+			0,
+
+			// How many frames are in each animation, and at what frame they start.
+			{
+				swing: {
+					start: 0,
+					end: 6,
+				},
 			},
-		};
+
+			// OnFinish
+			(thisAnimation) => {
+				thisAnimation.attacking = false;
+			},
+
+			// Extra props.
+			{
+				hitbox: {
+					x: 0,
+					y: 0,
+					width: 0,
+					height: 0,
+				},
+				attacking: false,
+			}
+		);
 		this.hitStrength = 1 * 0.25; // How much damage the player does.
 		this.knockback = 4;
-
-		// Load the player's attack animation spritesheet.
-		this.load_attack_spritesheet();
-	}
-
-	// Load the image source for the spritesheet. Should be done before any rendering is attempted. But the rendering is given a try catch since JS is asynchronous.
-	load_spritesheet() {
-		let img = new Image();
-		img.onload = () => {
-			this.animation.map = img;
-		};
-		img.src = "./data/images/spritesheet_player.png";
-	}
-
-	// Load the image source for the attack spritesheet.
-	load_attack_spritesheet() {
-		let img = new Image();
-		img.onload = () => {
-			this.attackAnimation.map = img;
-		};
-		img.src = "./data/images/spritesheet_player_attack.png";
 	}
 
 	// Attack handling.
@@ -132,23 +124,11 @@ class Player {
 			this.attackAnimation.attacking = true;
 		}
 	}
+
 	animateAttacking() {
 		// Only animate the attack animation if we are attacking.
 		if (this.attackAnimation.attacking) {
-			// Update animation steps.
-			this.attackAnimation.tick++; // Add to the tick.
-
-			// Move to the next frame if the speed/tick counter completes.
-			if (this.attackAnimation.tick > this.attackAnimation.speed) {
-				this.attackAnimation.tick = 0;
-				this.attackAnimation.frame++;
-			}
-
-			// If we have finished an animation, then we end.
-			if (this.attackAnimation.frame > this.attackAnimation.endFrame) {
-				this.attackAnimation.frame = 0;
-				this.attackAnimation.attacking = false;
-			}
+			this.attackAnimation.animate();
 		}
 	}
 
@@ -159,15 +139,6 @@ class Player {
 			(this.physics.velocity.velocity / this.speed) *
 			this.animation.overallSpeed;
 
-		// Update animation steps.
-		this.animation.tick++; // Add to the tick.
-
-		// Move to the next frame if the speed/tick counter completes.
-		if (this.animation.tick > this.animation.speed) {
-			this.animation.tick = 0;
-			this.animation.frame++;
-		}
-
 		// Determine which animation should be playing.
 		if (this.physics.velocity.velocity < 0.01) {
 			this.animation.name = "stand";
@@ -175,19 +146,8 @@ class Player {
 			this.animation.name = "walk";
 		}
 
-		// If we have finished an animation, restart it.
-		if (
-			this.animation.frame >
-			this.animation.frameCounts[this.animation.name].end
-		) {
-			// BREAKDOWN:
-			/*  
-                where the data for framecounts is stored      the name of the currently playing animation       the frame start or end position of the animation.
-                this.animation.frameCounts                    [this.animation.name]                             start/end
-            */
-			this.animation.frame =
-				this.animation.frameCounts[this.animation.name].start;
-		}
+		// Trigger the animation.
+		this.animation.animate();
 
 		// Animate attacking.
 		this.animateAttacking();

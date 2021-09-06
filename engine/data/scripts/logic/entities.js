@@ -76,63 +76,31 @@ class Torch extends Entity {
 		this.solid = true; // Torches can be walked through.
 
 		// Animation data.
-		this.animationMap = new Sheet("spritesheet_torch");
-
-		// Wait for the animation map to load.
-		this.loadMap = () => {
-			this.animation.map = this.animationMap.map;
-		};
-
-		this.animation = {
-			map: this.animationMap.map,
-			name: "loop", // The name of the current animation.
-			frame: 0, // The frame of the current animation.
-			speed: 1, // The speed of the current animation. Bigger numbers are slower.
-			tick: 0, // The current position in the frame.
-			frameCounts: {
+		this.animation = new Anim(
+			"spritesheet_torch",
+			"loop",
+			0,
+			4,
+			{
 				// How many frames are in each animation, and at what frame they start.
 				loop: {
 					start: 0,
 					end: 2,
 				},
 			},
-		};
+			undefined,
+			{}
+		);
 	}
 
 	// Animate the torch.
 	animate() {
-		// Check if the animation has been loaded.
-		if (this.animation.map === undefined) {
-			this.loadMap();
+		// Flicker the light if we should.
+		if (this.lightPulses && this.animation.frame % 3) {
+			this.lightStrength += randRange(-1, 1);
 		}
 
-		// Update animation steps.
-		this.animation.tick++; // Add to the tick.
-
-		// Move to the next frame if the speed/tick counter completes.
-		if (this.animation.tick > this.animation.speed) {
-			this.animation.tick = 0;
-			this.animation.frame++;
-
-			// Flicker the light if we should.
-			if (this.lightPulses && this.animation.frame % 3) {
-				this.lightStrength += randRange(-1, 1);
-			}
-		}
-
-		// If we have finished an animation, restart it.
-		if (
-			this.animation.frame >
-			this.animation.frameCounts[this.animation.name].end
-		) {
-			// BREAKDOWN:
-			/*  
-            where the data for framecounts is stored      the name of the currently playing animation       the frame start or end position of the animation.
-            this.animation.frameCounts                    [this.animation.name]                             start/end
-        */
-			this.animation.frame =
-				this.animation.frameCounts[this.animation.name].start;
-		}
+		this.animation.animate();
 	}
 
 	logic() {

@@ -1,28 +1,5 @@
 "use strict";
 
-// Global Objects.
-
-// Tilemaps and Spritesheets.
-class Sheet {
-	constructor(src, locs) {
-		this.loaded = false;
-		this.src = src;
-		this.map = undefined;
-		this.locs = locs;
-
-		this.load();
-	}
-
-	load = () => {
-		let img = new Image();
-		img.onload = () => {
-			this.map = img;
-			this.loaded = true;
-		};
-		img.src = `./data/images/${this.src}.png`;
-	};
-}
-
 // Specific Objects.
 
 // Items.
@@ -221,7 +198,7 @@ class Tile {
 				// Get and apply the lighting data for this tile.
 				ctx.globalAlpha = this.globalAlpha;
 			}
-            
+
 			ctx.beginPath();
 
 			ctx.drawImage(
