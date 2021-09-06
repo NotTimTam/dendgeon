@@ -65,4 +65,4 @@ By building the crawler out as a full game, I am able to implement features that
 -   ~~Raycast lighting.~~ (ADDED V.0.3.3)
 -   Sound effects.
 -   Move all spritesheets to new spritesheet loading system.
--   ~~Add global animation functions.~~ (ADDED V.0.3.3)
+-   ~~Add global animation functions.~~ (ADDED V.0.3.4)
