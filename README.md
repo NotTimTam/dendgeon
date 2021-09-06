@@ -66,3 +66,7 @@ By building the crawler out as a full game, I am able to implement features that
 -   Sound effects.
 -   Move all spritesheets to new spritesheet loading system.
 -   ~~Add global animation functions.~~ (ADDED V.0.3.4)
+-   Doom-like 3D rendering with raycasting.
+-   Chest room.
+-   More kinds of loot.
+-   Enemy drops.
