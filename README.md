@@ -53,6 +53,7 @@ There isn't official documentation yet, but everything is thoroughly commented a
 -   Fully customizable entity system.
 
 ### Changelog
+Newest changes on top. Once a major version change is completed all of its sub-version changes are compiled under one heading.
 
 #### V.0.3.5
 
