@@ -34,10 +34,12 @@ There isn't official documentation yet, but everything is thoroughly commented a
 -   Efficient, complex **spritesheet-based image rendering system**.
 
     -   One for **rendering static objects** from a spritesheet. (faster than having thousands of images that have to be loaded in individually)
-<img src="./engine/data/images/tilemap.png" alt="spritestrip" width="400" style="image-rendering: pixelated;"/>
+    
+    <img src="./engine/data/images/tilemap.png" alt="spritestrip" width="400" style="image-rendering: pixelated;"/>
 
     -   The other, for **rendering an animation**, or animations from a spritestrip.
-<img src="./engine/data/images/spritesheet_player.png" alt="spritestrip" width="400" style="image-rendering: pixelated;"/>
+    
+    <img src="./engine/data/images/spritesheet_player.png" alt="spritestrip" width="400" style="image-rendering: pixelated;"/>
 
 -   Tile based **rooms with events and triggers**.
 -   A robust, but simple, **object-focused collision system**. (meaning each object can handle its own collisions differently, and handle what objects it will collide with)
