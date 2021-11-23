@@ -66,7 +66,7 @@ Newest changes on top. Once a major version change is completed all of its sub-v
 #### V.0.3.4 - 2021-9-5
 
 -   Made animation functionality a global class for less repetative code.
--   Fixed bug where some game objects would have their render code run while they were on-screen.
+-   Fixed bug where some game objects would have their render code run while they were off-screen.
 
 #### V.0.3.3 - 2021-9-4
 
