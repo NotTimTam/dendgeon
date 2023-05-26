@@ -1,8 +1,7 @@
 /**
  * Imports
  */
-import EventListenerHandler from "../handlers/EventListenerHandler.js";
-import { Keyboard, Mouse, Renderer, Time, player, world } from "../index.js";
+import { player, world } from "../index.js";
 
 /**
  * Handles camera positioning and rendering.
@@ -15,7 +14,7 @@ class Camera {
 		this.__rawAngle = 0;
 
 		this.fov = 90;
-		this.__rawRenderDistance = 24; // 24
+		this.__rawRenderDistance = 24;
 
 		this.lockToPlayer = true; // Whether to have the camera follow the player.
 	}

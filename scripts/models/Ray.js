@@ -113,11 +113,18 @@ export const checkRayWallIntersection = (ray, wall) => {
 
 	const det = (c - a) * (s - q) - (r - p) * (d - b);
 	if (det === 0) {
-		return false;
+		return [false];
 	} else {
 		const lambda = ((s - q) * (r - a) + (p - r) * (s - b)) / det;
 		const gamma = ((b - d) * (r - a) + (c - a) * (s - b)) / det;
-		return 0 < lambda && lambda < 1 && 0 < gamma && gamma < 1;
+
+		if (0 < lambda && lambda < 1 && 0 < gamma && gamma < 1) {
+			const hitX = a + lambda * (c - a);
+			const hitY = b + lambda * (d - b);
+			return [true, hitX, hitY];
+		} else {
+			return [false];
+		}
 	}
 };
 
@@ -169,13 +176,13 @@ class Ray {
 				);
 
 				for (const line of nearLines) {
-					if (
-						checkRayWallIntersection(
-							[...this.start, this.x, this.y],
-							line
-						)
-					) {
-						this.hit = true;
+					const [hit, hitX, hitY] = checkRayWallIntersection(
+						[...this.start, this.x, this.y],
+						line
+					);
+					if (hit) {
+						this.hit = [hitX, hitY];
+
 						return this;
 					}
 				}

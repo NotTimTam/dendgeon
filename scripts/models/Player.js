@@ -12,7 +12,7 @@ class Player {
 		this.speed = 200;
 
 		this.angle = 0;
-		this.mouseSensitivity = 100;
+		this.mouseSensitivity = 50;
 	}
 
 	input() {

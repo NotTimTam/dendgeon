@@ -185,71 +185,106 @@ class World {
 		}
 	}
 
-	// 3d rendering.
-	__3dViewRaycast(ctx) {
+	/**
+	 * Render all walls in 2d.
+	 * @param {CanvasRenderingContext2D} ctx The render context.
+	 */
+	__3dWalls(ctx) {
 		const { fov, renderDistance } = camera;
 		const {
-			canvas: { width },
+			canvas: { width, height },
+			resolutionDegradation,
 		} = Renderer;
 		const { x, y, angle } = player;
 
-		// player.render2d(ctx);
+		const halfHeight = height / 2;
 
-		const resolutionDegredation = 4;
+		const wallTexture = document.querySelector("#brickimage");
 
-		for (let i = 0; i < width; i += resolutionDegredation) {
+		for (let i = 0; i < width; i += resolutionDegradation) {
 			const a = angle + fov * (i / width) + -fov / 2;
 
 			const ray = new Ray(x, y, a).cast(3, renderDistance);
-			const height =
+
+			const distance = calculateDistance(x, y, ray.x, ray.y);
+			const opaq =
 				(renderDistance - calculateDistance(x, y, ray.x, ray.y)) /
 				renderDistance;
 
-			console.log(height);
+			const perpendicularDistance =
+				distance * Math.cos(degreeToRadian(a - angle));
 
-			// ray.render2d(ctx);
+			const wallHeight =
+				(renderDistance / perpendicularDistance) * halfHeight;
+			const scale = 0.25;
 
 			if (!ray.hit) continue;
-			ctx.beginPath();
 
-			ctx.fillStyle = `rgba(${height * 255},0,255, ${height})`;
+			// ctx.beginPath();
 
-			ctx.fillRect(
-				i,
-				(ctx.canvas.height - ctx.canvas.height * height) / 2,
-				resolutionDegredation,
-				ctx.canvas.height * height
+			// ctx.fillStyle = `rgba(${opaq * 255}, 0, 255, 1)`;
+
+			// ctx.fillRect(
+			// 	i,
+			// 	halfHeight - (wallHeight * scale) / 2,
+			// 	resolutionDegradation,
+			// 	wallHeight * scale
+			// );
+
+			// ctx.closePath();
+
+			const textureX = Math.floor(
+				(ray.hit[1] % 1) * (wallTexture.width / resolutionDegradation)
 			);
 
-			ctx.closePath();
+			// Draw the textured wall
+			ctx.drawImage(
+				wallTexture,
+				textureX,
+				0,
+				resolutionDegradation,
+				wallTexture.height,
+				i,
+				halfHeight - (wallHeight * scale) / 2,
+				resolutionDegradation,
+				wallHeight * scale
+			);
 		}
+	}
 
-		// let i = 0;
-		// for (let a = -fov / 2; a < fov / 2; a += 1) {
-		// 	const ray = new Ray(x, y, angle + a).cast(3, renderDistance);
-		// 	ray.render2d(ctx);
-
-		// 	if (!ray.hit) {
-		// 		continue;
-		// 	}
-
-		// 	const dist = calculateDistance(x, y, ray.x, ray.y);
-
+	/**
+	 * Render the floor in 2d.
+	 * @param {CanvasRenderingContext2D} ctx The render context.
+	 */
+	__3dFloor(ctx) {
+		// const { fov, renderDistance } = camera;
+		// const {
+		// 	canvas: { width, height },
+		// 	resolutionDegradation,
+		// } = Renderer;
+		// const { x, y, angle } = player;
+		// // Calculate the maximum distance at which the floor should be fully visible
+		// const maxVisibleDistance = renderDistance / 2;
+		// for (let i = 0; i < width; i += resolutionDegradation) {
+		// 	const a = angle + fov * (i / width) + -fov / 2;
+		// 	const ray = new Ray(x, y, a).cast(3, renderDistance);
+		// 	// Apply fishbowl correction to the distance
+		// 	const correctedDistance =
+		// 		Math.sqrt(x * y + ray.x * ray.y) * Math.cos(degreeToRadian(a));
+		// 	// Calculate the darkness factor based on the distance
+		// 	const darknessFactor = correctedDistance / maxVisibleDistance;
 		// 	ctx.beginPath();
-
-		// 	ctx.fillStyle = "blue";
-
-		// 	ctx.fillRect(
-		// 		i * ratio,
-		// 		ctx.canvas.height - (dist / renderDistance) * ctx.canvas.height,
-		// 		ratio,
-		// 		ctx.canvas.height - (dist / renderDistance) * ctx.canvas.height
-		// 	);
-
+		// 	// Render floor with fading effect
+		// 	ctx.fillStyle = `rgba(100, 100, 100, ${0.5 * darknessFactor})`;
+		// 	ctx.fillRect(i, height / 2, resolutionDegradation, height / 2);
 		// 	ctx.closePath();
-
-		// 	i++;
 		// }
+	}
+
+	// 3d rendering.
+	__3dViewRaycast(ctx) {
+		this.__3dFloor(ctx);
+		this.__3dWalls(ctx);
 	}
 
 	/**

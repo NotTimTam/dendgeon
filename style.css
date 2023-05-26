@@ -76,7 +76,6 @@ p {
 }
 
 canvas#render-target {
-	border: 1px solid red;
 	background: #000000;
 
 	z-index: 999;
@@ -90,4 +89,8 @@ canvas#render-target {
 
 	max-width: calc(calc(100vh / 3) * 4);
 	max-height: calc(calc(100vw / 4) * 3);
+}
+
+img {
+	display: none;
 }
