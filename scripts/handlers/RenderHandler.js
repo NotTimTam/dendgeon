@@ -16,7 +16,7 @@ class RenderHandler {
 		this.mode = "3d"; // "2d" || "3d"
 
 		// Render settings.
-		this.resolutionDegradation = 2;
+		this.resolutionDegradation = 1;
 
 		// Store renderable objects.
 
@@ -116,7 +116,6 @@ class RenderHandler {
 			const { ctx } = this;
 
 			world.render3d(ctx);
-			// this.render2d();
 		} catch (err) {
 			console.error("Failed to run 3d render pipeline.", err);
 		}

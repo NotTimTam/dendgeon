@@ -233,9 +233,13 @@ class World {
 
 			// ctx.closePath();
 
-			const textureX = Math.floor(
-				(ray.hit[1] % 1) * (wallTexture.width / resolutionDegradation)
-			);
+			// const textureX = Math.floor(
+			// 	(ray.hit[1] % 1) * (wallTexture.width / resolutionDegradation)
+			// );
+
+			const textureX =
+				(ray.hit % wallTexture.width) *
+				(wallTexture.width / resolutionDegradation);
 
 			// Draw the textured wall
 			ctx.drawImage(
@@ -256,34 +260,32 @@ class World {
 	 * Render the floor in 2d.
 	 * @param {CanvasRenderingContext2D} ctx The render context.
 	 */
-	__3dFloor(ctx) {
-		// const { fov, renderDistance } = camera;
-		// const {
-		// 	canvas: { width, height },
-		// 	resolutionDegradation,
-		// } = Renderer;
-		// const { x, y, angle } = player;
-		// // Calculate the maximum distance at which the floor should be fully visible
-		// const maxVisibleDistance = renderDistance / 2;
-		// for (let i = 0; i < width; i += resolutionDegradation) {
-		// 	const a = angle + fov * (i / width) + -fov / 2;
-		// 	const ray = new Ray(x, y, a).cast(3, renderDistance);
-		// 	// Apply fishbowl correction to the distance
-		// 	const correctedDistance =
-		// 		Math.sqrt(x * y + ray.x * ray.y) * Math.cos(degreeToRadian(a));
-		// 	// Calculate the darkness factor based on the distance
-		// 	const darknessFactor = correctedDistance / maxVisibleDistance;
-		// 	ctx.beginPath();
-		// 	// Render floor with fading effect
-		// 	ctx.fillStyle = `rgba(100, 100, 100, ${0.5 * darknessFactor})`;
-		// 	ctx.fillRect(i, height / 2, resolutionDegradation, height / 2);
-		// 	ctx.closePath();
-		// }
+	__3dFloorAndCeiling(ctx) {
+		const {
+			canvas: { width, height },
+			resolutionDegradation,
+		} = Renderer;
+
+		for (let y = height / 2; y < height; y++) {
+			ctx.beginPath();
+
+			ctx.fillStyle = `rgba(100,100,100, ${y / height / 4})`;
+			ctx.fillRect(0, y, width, 1);
+
+			ctx.closePath();
+		}
+
+		ctx.beginPath();
+
+		ctx.fillStyle = `skyblue`;
+		ctx.fillRect(0, 0, width, height / 2);
+
+		ctx.closePath();
 	}
 
 	// 3d rendering.
 	__3dViewRaycast(ctx) {
-		this.__3dFloor(ctx);
+		this.__3dFloorAndCeiling(ctx);
 		this.__3dWalls(ctx);
 	}
 

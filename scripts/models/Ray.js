@@ -1,4 +1,4 @@
-import { world } from "../index.js";
+import { player, world } from "../index.js";
 
 /**
  * Convert an angle in degrees to an angle in radians.
@@ -121,7 +121,15 @@ export const checkRayWallIntersection = (ray, wall) => {
 		if (0 < lambda && lambda < 1 && 0 < gamma && gamma < 1) {
 			const hitX = a + lambda * (c - a);
 			const hitY = b + lambda * (d - b);
-			return [true, hitX, hitY];
+
+			const wallLength =
+				Math.sqrt(Math.pow(r - p, 2) + Math.pow(s - q, 2)) + 2;
+			const positionX = Math.sqrt(
+				Math.pow(hitX - p, 2) + Math.pow(hitY - q, 2)
+			);
+			const position = positionX / wallLength;
+
+			return [true, position];
 		} else {
 			return [false];
 		}
@@ -176,12 +184,12 @@ class Ray {
 				);
 
 				for (const line of nearLines) {
-					const [hit, hitX, hitY] = checkRayWallIntersection(
+					const [hit, hitPosition] = checkRayWallIntersection(
 						[...this.start, this.x, this.y],
 						line
 					);
 					if (hit) {
-						this.hit = [hitX, hitY];
+						this.hit = hitPosition;
 
 						return this;
 					}
