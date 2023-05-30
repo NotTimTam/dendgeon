@@ -13,7 +13,7 @@ class Player {
 		this.speed = 200;
 
 		this.angle = 0.1;
-		this.mouseSensitivity = 50;
+		this.mouseSensitivity = 25;
 	}
 
 	input() {
@@ -27,6 +27,7 @@ class Player {
 				a,
 				s,
 				d,
+				shift,
 			} = Keyboard.keys;
 
 			const { speed } = this;
@@ -42,6 +43,8 @@ class Player {
 			} else if ((down || s) && (right || d)) {
 				speedMultiplier = 0.7071; // Adjust speed for diagonal movement (sqrt(2)/2)
 			}
+
+			if (shift) speedMultiplier *= 2;
 
 			const actSpeed = speed * speedMultiplier * Time.deltaTime;
 
