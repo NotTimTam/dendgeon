@@ -23,6 +23,7 @@ class World {
 		// 3d rendering configuration.
 		this.wallScale = 0.25;
 		this.textureRepeatFactor = 5;
+		this.textureOverlapCompensation = 1;
 
 		// Level configuration.
 		this.level = null;
@@ -211,11 +212,80 @@ class World {
 			canvas: { width, height },
 		} = Renderer;
 		const { x, y, angle } = player;
-		const { wallScale, textureRepeatFactor } = this;
+		const { wallScale, textureRepeatFactor, textureOverlapCompensation } =
+			this;
 
 		const halfHeight = height / 2;
 
 		const wallTexture = document.querySelector("#brickimage");
+
+		// const wallArray = Array.from(
+		// 	{ length: Math.ceil(width / resolutionDegradation) },
+		// 	(_, i) => i * resolutionDegradation
+		// )
+		// 	// Map each screen column to a ray and cast it.
+		// 	.map((i) => {
+		// 		const a = angle + fov * (i / width) + -fov / 2;
+		// 		return [a, new Ray(x, y, a).cast(3, renderDistance), i];
+		// 	})
+		// 	// Get only rays that hit.
+		// 	.filter(([_, ray]) => ray.hit)
+		// 	.sort(([_, a], [__, b]) => {
+		// 		const distance1 = calculateDistance(x, y, a.x, a.y);
+		// 		const distance2 = calculateDistance(x, y, b.x, b.y);
+
+		// 		return distance2 - distance1;
+		// 	})
+		// 	.forEach(([a, ray, i]) => {
+		// 		const distance = calculateDistance(x, y, ray.x, ray.y);
+
+		// 		const perpendicularDistance =
+		// 			distance * Math.cos(degreeToRadian(a - angle));
+
+		// 		const wallHeight =
+		// 			(wallHeightGridRatio / perpendicularDistance) *
+		// 			halfHeight *
+		// 			wallScale;
+
+		// 		const [hitPos, wallLength] = ray.hit;
+
+		// 		const textureX =
+		// 			((wallLength / textureRepeatFactor) *
+		// 				(hitPos % wallLength)) %
+		// 			wallTexture.width;
+
+		// 		const opaq =
+		// 			((lightDistance - calculateDistance(x, y, ray.x, ray.y)) /
+		// 				lightDistance) *
+		// 			shadowClamp(hitPos, 0.01, 0.99);
+
+		// 		// Draw the textured wall
+		// 		ctx.drawImage(
+		// 			wallTexture,
+		// 			textureX, // Grab X
+		// 			0, // Grab Y
+		// 			resolutionDegradation, // Grab Width
+		// 			wallTexture.height, // Grab Height
+		// 			Math.round(i), // Draw X
+		// 			halfHeight - wallHeight / 2, // Draw Y
+		// 			resolutionDegradation + textureOverlapCompensation, // Draw width
+		// 			wallHeight // Draw Height
+		// 		);
+
+		// 		// Apply light filter for distance.
+		// 		ctx.beginPath();
+
+		// 		ctx.fillStyle = `rgba(0,0,0, ${0.5 - opaq})`;
+
+		// 		ctx.fillRect(
+		// 			i,
+		// 			halfHeight - wallHeight / 2,
+		// 			resolutionDegradation + textureOverlapCompensation,
+		// 			wallHeight
+		// 		);
+
+		// 		ctx.closePath();
+		// 	});
 
 		for (let i = 0; i < width; i += resolutionDegradation) {
 			const a = angle + fov * (i / width) + -fov / 2;
@@ -253,7 +323,7 @@ class World {
 				wallTexture.height, // Grab Height
 				i, // Draw X
 				halfHeight - wallHeight / 2, // Draw Y
-				resolutionDegradation, // Draw Width
+				resolutionDegradation, // Draw width
 				wallHeight // Draw Height
 			);
 
@@ -264,9 +334,9 @@ class World {
 
 			ctx.fillRect(
 				i,
-				halfHeight - wallHeight / 2,
+				halfHeight - wallHeight / 2 - textureOverlapCompensation,
 				resolutionDegradation,
-				wallHeight
+				wallHeight + textureOverlapCompensation * 2
 			);
 
 			ctx.closePath();
@@ -295,7 +365,7 @@ class World {
 			ctx.closePath();
 		}
 
-		for (let y = height / 2; y > 0; y--) {
+		for (let y = height / 2 - 1; y > 1; y--) {
 			ctx.beginPath();
 
 			ctx.fillStyle = `rgba(100,100,100, ${

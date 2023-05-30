@@ -13,12 +13,12 @@ class Camera {
 
 		this.__rawAngle = 0;
 
-		this.fov = 90;
-		this.__rawRenderDistance = 48;
-		this.__rawLightDistance = 24;
-		this.__rawWallHeightGridRatio = 16;
+		this.fov = 90; // 90 is ideal.
+		this.__rawRenderDistance = 48; // 48 is ideal.
+		this.__rawLightDistance = 24; // 24 is ideal.
+		this.__rawWallHeightGridRatio = 16; // 16 is ideal.
 
-		this.resolutionDegradation = 1;
+		this.resolutionDegradation = 1; // 1 is ideal.
 
 		this.lockToPlayer = true; // Whether to have the camera follow the player.
 	}
