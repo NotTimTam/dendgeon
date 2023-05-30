@@ -3,7 +3,11 @@
  */
 import levels from "../data/Levels.js";
 import { Renderer, camera, player } from "../index.js";
-import { calculateDistance, degreeToRadian } from "../util/Math.js";
+import {
+	calculateDistance,
+	degreeToRadian,
+	shadowClamp,
+} from "../util/Math.js";
 import Ray from "./Ray.js";
 
 /**
@@ -15,6 +19,9 @@ class World {
 	 */
 	constructor(initialLevel = null) {
 		this.grid = 48; // 2d display gap control.
+
+		// 3d rendering configuration.
+		this.wallScale = 0.25;
 
 		// Level configuration.
 		this.level = null;
@@ -95,6 +102,7 @@ class World {
 			// Configure objects.
 			player.x = spawn[0] * grid;
 			player.y = spawn[1] * grid;
+			player.angle = spawn[2] || 0.1;
 		} catch (err) {
 			console.error(`Failed to load level with label "${name}"`, err);
 		}
@@ -191,12 +199,18 @@ class World {
 	 * @param {CanvasRenderingContext2D} ctx The render context.
 	 */
 	__3dWalls(ctx) {
-		const { fov, renderDistance } = camera;
+		const {
+			fov,
+			resolutionDegradation,
+			renderDistance,
+			lightDistance,
+			wallHeightGridRatio,
+		} = camera;
 		const {
 			canvas: { width, height },
-			resolutionDegradation,
 		} = Renderer;
 		const { x, y, angle } = player;
+		const { wallScale } = this;
 
 		const halfHeight = height / 2;
 
@@ -207,22 +221,25 @@ class World {
 			const ray = new Ray(x, y, a).cast(3, renderDistance);
 
 			const distance = calculateDistance(x, y, ray.x, ray.y);
-			const opaq =
-				(renderDistance - calculateDistance(x, y, ray.x, ray.y)) /
-				renderDistance;
 
 			const perpendicularDistance =
 				distance * Math.cos(degreeToRadian(a - angle));
 
 			const wallHeight =
-				(renderDistance / perpendicularDistance) * halfHeight;
-			const scale = 0.25;
+				(wallHeightGridRatio / perpendicularDistance) *
+				halfHeight *
+				wallScale;
 
 			if (!ray.hit) continue;
 
 			const [hitPos, wallLength] = ray.hit;
 
 			const textureX = (hitPos % wallTexture.width) * wallTexture.width;
+
+			const opaq =
+				((lightDistance - calculateDistance(x, y, ray.x, ray.y)) /
+					lightDistance) *
+				shadowClamp(hitPos, 0.01, 0.99);
 
 			// Draw the textured wall
 			// ctx.drawImage(
@@ -232,9 +249,9 @@ class World {
 			// 	resolutionDegradation,
 			// 	wallTexture.height,
 			// 	i,
-			// 	halfHeight - (wallHeight * scale) / 2,
+			// 	halfHeight - (wallHeight) / 2,
 			// 	resolutionDegradation,
-			// 	wallHeight * scale
+			// 	wallHeight
 			// );
 
 			// const textureX = Math.floor(
@@ -256,9 +273,9 @@ class World {
 			ctx.fillStyle = pat;
 			ctx.fillRect(
 				i,
-				halfHeight - (wallHeight * scale) / 2,
+				halfHeight - wallHeight / 2,
 				resolutionDegradation,
-				wallHeight * scale
+				wallHeight
 			);
 
 			// ctx.drawImage(
@@ -268,11 +285,12 @@ class World {
 			// 	resolutionDegradation,
 			// 	wallTexture.height,
 			// 	i,
-			// 	halfHeight - (wallHeight * scale) / 2,
+			// 	halfHeight - (wallHeight) / 2,
 			// 	resolutionDegradation,
-			// 	wallHeight * scale
+			// 	wallHeight
 			// );
 
+			// Apply light filter for distance.
 			ctx.beginPath();
 
 			ctx.fillStyle = `rgba(${opaq * 100}, ${opaq * 100}, ${
@@ -281,12 +299,32 @@ class World {
 
 			ctx.fillRect(
 				i,
-				halfHeight - (wallHeight * scale) / 2,
+				halfHeight - wallHeight / 2,
 				resolutionDegradation,
-				wallHeight * scale
+				wallHeight
 			);
 
 			ctx.closePath();
+
+			//  Floor and ceiling shadows.
+
+			// const topOfWall = halfHeight - wallHeight / 2;
+			// const bottomOfWall = topOfWall + wallHeight;
+			// const bottomShadowStart = 0.75;
+
+			// for (
+			// 	let shadowY = topOfWall + wallHeight * bottomShadowStart;
+			// 	shadowY < bottomOfWall;
+			// 	shadowY += 1
+			// ) {
+			// 	ctx.beginPath();
+
+			// 	ctx.fillStyle = `rgba(0,0,0,${(shadowY / bottomOfWall) * 0.5})`;
+
+			// 	ctx.fillRect(i, shadowY, resolutionDegradation, 1);
+
+			// 	ctx.closePath();
+			// }
 		}
 	}
 
@@ -300,21 +338,36 @@ class World {
 			resolutionDegradation,
 		} = Renderer;
 
+		const ceilingDarkness = 2;
+		const floorDarkness = 4;
+
 		for (let y = height / 2; y < height; y++) {
 			ctx.beginPath();
 
-			ctx.fillStyle = `rgba(100,100,100, ${y / height / 4})`;
+			ctx.fillStyle = `rgba(100,100,100, ${y / height / floorDarkness})`;
 			ctx.fillRect(0, y, width, 1);
 
 			ctx.closePath();
 		}
 
-		ctx.beginPath();
+		for (let y = height / 2; y > 0; y--) {
+			ctx.beginPath();
 
-		ctx.fillStyle = `skyblue`;
-		ctx.fillRect(0, 0, width, height / 2);
+			ctx.fillStyle = `rgba(100,100,100, ${
+				(height - y) / height / ceilingDarkness
+			})`;
+			ctx.fillRect(0, y, width, 1);
 
-		ctx.closePath();
+			ctx.closePath();
+		}
+
+		// Blue sky.
+		// ctx.beginPath();
+
+		// ctx.fillStyle = `skyblue`;
+		// ctx.fillRect(0, 0, width, height / 2);
+
+		// ctx.closePath();
 	}
 
 	// 3d rendering.

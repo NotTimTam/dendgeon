@@ -14,9 +14,20 @@ class Camera {
 		this.__rawAngle = 0;
 
 		this.fov = 90;
-		this.__rawRenderDistance = 24;
+		this.__rawRenderDistance = 48;
+		this.__rawLightDistance = 24;
+		this.__rawWallHeightGridRatio = 16;
+
+		this.resolutionDegradation = 1;
 
 		this.lockToPlayer = true; // Whether to have the camera follow the player.
+	}
+
+	/**
+	 * Determine wallheight based on grid dimensions.
+	 */
+	get wallHeightGridRatio() {
+		return world.grid * this.__rawWallHeightGridRatio;
 	}
 
 	/**
@@ -24,6 +35,13 @@ class Camera {
 	 */
 	get renderDistance() {
 		return this.__rawRenderDistance * world.grid;
+	}
+
+	/**
+	 * Get the light distance in pixels.
+	 */
+	get lightDistance() {
+		return this.__rawLightDistance * world.grid;
 	}
 
 	/**

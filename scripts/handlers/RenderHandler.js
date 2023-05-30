@@ -2,6 +2,7 @@
  * Imports
  */
 import { Mouse, Time, camera, player, world } from "../index.js";
+import { degreeToRadian } from "../util/Math.js";
 
 /**
  * Handles 2d and 3d rendering to the screen.
@@ -22,10 +23,7 @@ class RenderHandler {
 		this.ctx.imageSmoothingEnabled = false;
 
 		// Set the current render mode.
-		this.mode = renderMode || "3d"; // "2d" || "3d"
-
-		// Render settings.
-		this.resolutionDegradation = 1;
+		this.mode = renderMode || "3d"; // "2d" || "3d" || "both"
 
 		// Store renderable objects.
 
@@ -35,7 +33,7 @@ class RenderHandler {
 		 * property of the canvas, either in the CSS or with the
 		 * style attribute of the canvas element.
 		 */
-		this.__rawResolution = 640; // 640x480
+		this.__rawResolution = 320; // 640x480 is ideal.
 		this.resize();
 
 		// Bind the render loop to the renderer.
@@ -100,6 +98,7 @@ class RenderHandler {
 			const { ctx } = this;
 
 			ctx.save();
+
 			ctx.setTransform(
 				1,
 				0,
@@ -154,8 +153,8 @@ class RenderHandler {
 
 			// Render
 			this.clear(); // Clear the screen each frame.
-			if (mode === "2d") this.render2d();
-			else this.render3d();
+			if (mode === "3d" || mode === "both") this.render3d();
+			if (mode === "2d" || mode === "both") this.render2d();
 
 			requestAnimationFrame(this.loop);
 		} catch (err) {

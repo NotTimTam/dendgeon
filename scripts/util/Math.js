@@ -41,3 +41,13 @@ export const calculateDistance = (x1, y1, x2, y2) => {
 	const distance = Math.sqrt(dx * dx + dy * dy);
 	return distance;
 };
+
+/**
+ * Clamp a value for opacity control in shadows.
+ * @param {number} n The number to clamp.
+ * @param {number} l The lower clamp value.
+ * @param {number} u The upper clamp value.
+ * @returns The clamped number.
+ */
+export const shadowClamp = (n, l = 0.01, u = 0.99) =>
+	n >= 0 && n <= l ? 1 - n : n >= u && n <= 1 ? n : 1;
