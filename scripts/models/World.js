@@ -22,6 +22,7 @@ class World {
 
 		// 3d rendering configuration.
 		this.wallScale = 0.25;
+		this.textureRepeatFactor = 5;
 
 		// Level configuration.
 		this.level = null;
@@ -210,7 +211,7 @@ class World {
 			canvas: { width, height },
 		} = Renderer;
 		const { x, y, angle } = player;
-		const { wallScale } = this;
+		const { wallScale, textureRepeatFactor } = this;
 
 		const halfHeight = height / 2;
 
@@ -234,7 +235,9 @@ class World {
 
 			const [hitPos, wallLength] = ray.hit;
 
-			const textureX = (hitPos % wallTexture.width) * wallTexture.width;
+			const textureX =
+				((wallLength / textureRepeatFactor) * (hitPos % wallLength)) %
+				wallTexture.width;
 
 			const opaq =
 				((lightDistance - calculateDistance(x, y, ray.x, ray.y)) /
@@ -242,60 +245,22 @@ class World {
 				shadowClamp(hitPos, 0.01, 0.99);
 
 			// Draw the textured wall
-			// ctx.drawImage(
-			// 	wallTexture,
-			// 	textureX,
-			// 	0,
-			// 	resolutionDegradation,
-			// 	wallTexture.height,
-			// 	i,
-			// 	halfHeight - (wallHeight) / 2,
-			// 	resolutionDegradation,
-			// 	wallHeight
-			// );
-
-			// const textureX = Math.floor(
-			// 	(ray.hit[1] % 1) * (wallTexture.width / resolutionDegradation)
-			// );
-
-			var pat = ctx.createPattern(wallTexture, "repeat");
-			pat.setTransform(
-				new DOMMatrix([
-					1,
-					0,
-					0,
-					1,
-					wallTexture.width,
-					wallTexture.height,
-				])
-			); // set top left starting
-			// pos of pattern
-			ctx.fillStyle = pat;
-			ctx.fillRect(
-				i,
-				halfHeight - wallHeight / 2,
-				resolutionDegradation,
-				wallHeight
+			ctx.drawImage(
+				wallTexture,
+				textureX, // Grab X
+				0, // Grab Y
+				resolutionDegradation, // Grab Width
+				wallTexture.height, // Grab Height
+				i, // Draw X
+				halfHeight - wallHeight / 2, // Draw Y
+				resolutionDegradation, // Draw Width
+				wallHeight // Draw Height
 			);
-
-			// ctx.drawImage(
-			// 	wallTexture,
-			// 	textureX,
-			// 	0,
-			// 	resolutionDegradation,
-			// 	wallTexture.height,
-			// 	i,
-			// 	halfHeight - (wallHeight) / 2,
-			// 	resolutionDegradation,
-			// 	wallHeight
-			// );
 
 			// Apply light filter for distance.
 			ctx.beginPath();
 
-			ctx.fillStyle = `rgba(${opaq * 100}, ${opaq * 100}, ${
-				opaq * 100
-			}, 0.75)`;
+			ctx.fillStyle = `rgba(0,0,0, ${0.5 - opaq})`;
 
 			ctx.fillRect(
 				i,
@@ -305,26 +270,6 @@ class World {
 			);
 
 			ctx.closePath();
-
-			//  Floor and ceiling shadows.
-
-			// const topOfWall = halfHeight - wallHeight / 2;
-			// const bottomOfWall = topOfWall + wallHeight;
-			// const bottomShadowStart = 0.75;
-
-			// for (
-			// 	let shadowY = topOfWall + wallHeight * bottomShadowStart;
-			// 	shadowY < bottomOfWall;
-			// 	shadowY += 1
-			// ) {
-			// 	ctx.beginPath();
-
-			// 	ctx.fillStyle = `rgba(0,0,0,${(shadowY / bottomOfWall) * 0.5})`;
-
-			// 	ctx.fillRect(i, shadowY, resolutionDegradation, 1);
-
-			// 	ctx.closePath();
-			// }
 		}
 	}
 
