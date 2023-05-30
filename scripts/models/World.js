@@ -3,7 +3,8 @@
  */
 import levels from "../data/Levels.js";
 import { Renderer, camera, player } from "../index.js";
-import Ray, { calculateDistance, degreeToRadian } from "./Ray.js";
+import { calculateDistance, degreeToRadian } from "../util/Math.js";
+import Ray from "./Ray.js";
 
 /**
  * Manages levels and their objects.
@@ -203,7 +204,6 @@ class World {
 
 		for (let i = 0; i < width; i += resolutionDegradation) {
 			const a = angle + fov * (i / width) + -fov / 2;
-
 			const ray = new Ray(x, y, a).cast(3, renderDistance);
 
 			const distance = calculateDistance(x, y, ray.x, ray.y);
@@ -220,39 +220,73 @@ class World {
 
 			if (!ray.hit) continue;
 
-			// ctx.beginPath();
+			const [hitPos, wallLength] = ray.hit;
 
-			// ctx.fillStyle = `rgba(${opaq * 255}, 0, 255, 1)`;
+			const textureX = (hitPos % wallTexture.width) * wallTexture.width;
 
-			// ctx.fillRect(
+			// Draw the textured wall
+			// ctx.drawImage(
+			// 	wallTexture,
+			// 	textureX,
+			// 	0,
+			// 	resolutionDegradation,
+			// 	wallTexture.height,
 			// 	i,
 			// 	halfHeight - (wallHeight * scale) / 2,
 			// 	resolutionDegradation,
 			// 	wallHeight * scale
 			// );
 
-			// ctx.closePath();
-
 			// const textureX = Math.floor(
 			// 	(ray.hit[1] % 1) * (wallTexture.width / resolutionDegradation)
 			// );
 
-			const textureX =
-				(ray.hit % wallTexture.width) *
-				(wallTexture.width / resolutionDegradation);
-
-			// Draw the textured wall
-			ctx.drawImage(
-				wallTexture,
-				textureX,
-				0,
-				resolutionDegradation,
-				wallTexture.height,
+			var pat = ctx.createPattern(wallTexture, "repeat");
+			pat.setTransform(
+				new DOMMatrix([
+					1,
+					0,
+					0,
+					1,
+					wallTexture.width,
+					wallTexture.height,
+				])
+			); // set top left starting
+			// pos of pattern
+			ctx.fillStyle = pat;
+			ctx.fillRect(
 				i,
 				halfHeight - (wallHeight * scale) / 2,
 				resolutionDegradation,
 				wallHeight * scale
 			);
+
+			// ctx.drawImage(
+			// 	wallTexture,
+			// 	textureX,
+			// 	0,
+			// 	resolutionDegradation,
+			// 	wallTexture.height,
+			// 	i,
+			// 	halfHeight - (wallHeight * scale) / 2,
+			// 	resolutionDegradation,
+			// 	wallHeight * scale
+			// );
+
+			ctx.beginPath();
+
+			ctx.fillStyle = `rgba(${opaq * 100}, ${opaq * 100}, ${
+				opaq * 100
+			}, 0.75)`;
+
+			ctx.fillRect(
+				i,
+				halfHeight - (wallHeight * scale) / 2,
+				resolutionDegradation,
+				wallHeight * scale
+			);
+
+			ctx.closePath();
 		}
 	}
 

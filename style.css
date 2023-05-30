@@ -84,6 +84,7 @@ canvas#render-target {
 
 	flex-grow: 2;
 
+	image-rendering: crisp-edges;
 	image-rendering: pixelated;
 
 	max-width: calc(calc(100vh / 3) * 4);

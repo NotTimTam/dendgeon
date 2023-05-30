@@ -7,13 +7,22 @@ import { Mouse, Time, camera, player, world } from "../index.js";
  * Handles 2d and 3d rendering to the screen.
  */
 class RenderHandler {
-	constructor() {
+	/**
+	 *
+	 * @param {string} renderMode The default render mode. (`3d` or `2d`)
+	 */
+	constructor(renderMode = "3d") {
 		// Grab the canvas element and it's context.
 		this.canvas = document.querySelector("canvas#render-target");
 		this.ctx = this.canvas.getContext("2d");
 
+		// Configure context.
+		this.ctx.webkitImageSmoothingEnabled = false;
+		this.ctx.mozImageSmoothingEnabled = false;
+		this.ctx.imageSmoothingEnabled = false;
+
 		// Set the current render mode.
-		this.mode = "3d"; // "2d" || "3d"
+		this.mode = renderMode || "3d"; // "2d" || "3d"
 
 		// Render settings.
 		this.resolutionDegradation = 1;

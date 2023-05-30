@@ -1,5 +1,6 @@
 import { Keyboard, Mouse, Time, camera, world } from "../index.js";
-import Ray, { normalizeAngle, vectorToPosition } from "./Ray.js";
+import Ray from "./Ray.js";
+import { normalizeAngle, vectorToPosition } from "../util/Math.js";
 
 /**
  * The player object and its relative data and functions.
