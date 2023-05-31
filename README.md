@@ -4,6 +4,9 @@
 
 ## See it in action [here!](https://nottimtam.github.io/dendgeon/engine/)
 
+# Big changes on the way in /dev.
+Finally, [the raycasting you've been waiting for!](https://github.com/NotTimTam/dendgeon/tree/dev)
+
 ## About
 
 ![V 0.3 in-engine screenshot](./repo/v0.3.3_scr_1.png)
