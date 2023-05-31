@@ -8,13 +8,40 @@ import MouseHandler from "./handlers/MouseHandler.js";
 import RenderHandler from "./handlers/RenderHandler.js";
 import TimeHandler from "./handlers/TimeHandler.js";
 
-import Camera from "./models/Camera.js";
-import Player from "./models/Player.js";
-import World from "./models/World.js";
+import Sprite from "./models/Sprite.js";
+
+import CameraController from "./controllers/CameraController.js";
+import PlayerController from "./controllers/PlayerController.js";
+import WorldController from "./controllers/WorldController.js";
 
 /**
  * Configuration
  */
+
+export const masterConfig = {
+	mouse: {
+		deceleration: 12,
+		sensitivity: 12,
+	},
+	renderer: {
+		resolution: 320,
+	},
+	camera: {
+		fov: 90,
+		renderDistance: 48,
+		lightDistance: 24,
+		wallHeightGridRatio: 16,
+		resolutionDegredation: 1,
+		lockToPlayer: true,
+	},
+	player: { speed: 200 },
+	world: {
+		grid: 48,
+		wallScale: 0.25,
+		textureRepeatFactor: 5,
+		textureOverlapCompensation: 1,
+	},
+};
 
 export const fpsDisp = document.querySelector("p#fps");
 
@@ -22,16 +49,29 @@ export const fpsDisp = document.querySelector("p#fps");
  * Handlers
  */
 export const Time = new TimeHandler();
-export const Renderer = new RenderHandler("both");
+export const Renderer = new RenderHandler("both", masterConfig.renderer);
 export const Events = new EventListenerHandler();
 export const Keyboard = new KeyboardHandler();
-export const Mouse = new MouseHandler(Renderer);
+export const Mouse = new MouseHandler(Renderer, masterConfig.mouse);
 
 /**
- * Objects & Models
+ * Models
  */
-export const camera = new Camera();
-export const player = new Player();
-export const world = new World("dev_02");
+
+/**
+ * Controllers
+ */
+export const camera = new CameraController(masterConfig.camera);
+export const player = new PlayerController(null, null, masterConfig.player);
+export const world = new WorldController("dev_02", masterConfig.world);
+
+world.addGameObject(
+	new Sprite(
+		3 * masterConfig.world.grid,
+		3 * masterConfig.world.grid,
+		0,
+		world.grid / 2
+	)
+);
 
 Renderer.start();

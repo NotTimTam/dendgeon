@@ -12,20 +12,24 @@ class TimeHandler {
 	 * Calculate FPS and deltaTime.
 	 */
 	execute() {
-		if (!this.__lastCall) {
+		try {
+			if (!this.__lastCall) {
+				this.__lastCall = performance.now();
+				this.fps = 0;
+				return;
+			}
+
+			// Calculate delta time.
+			this.deltaTime = (performance.now() - this.__lastCall) / 1000;
+
+			// Set last call.
 			this.__lastCall = performance.now();
-			this.fps = 0;
-			return;
+
+			// Calculate framerate.
+			this.fps = 1 / this.deltaTime;
+		} catch (err) {
+			console.error("Failed to execute time handling.", err);
 		}
-
-		// Calculate delta time.
-		this.deltaTime = (performance.now() - this.__lastCall) / 1000;
-
-		// Set last call.
-		this.__lastCall = performance.now();
-
-		// Calculate framerate.
-		this.fps = 1 / this.deltaTime;
 	}
 }
 

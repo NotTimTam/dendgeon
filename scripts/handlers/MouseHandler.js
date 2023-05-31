@@ -2,6 +2,7 @@
  * Imports
  */
 import { Time } from "../index.js";
+import { minMax } from "../util/Math.js";
 import EventListenerHandler from "./EventListenerHandler.js";
 
 /**
@@ -10,8 +11,11 @@ import EventListenerHandler from "./EventListenerHandler.js";
 class MouseHandler {
 	/**
 	 * @param {RenderHandler} renderer The current renderer being used.
+	 * @param {*} options The mouse options object to pass through.
+	 * @param {number} options.deceleration The deceleration factor for normalizing mouse movement. (default `12`)
+	 * @param {number} options.sensitivity Control over mouse sensitivity for player input. (default `12`)
 	 */
-	constructor(renderer) {
+	constructor(renderer, options) {
 		// Save a reference to the renderer.
 		this.renderer = renderer;
 
@@ -23,7 +27,16 @@ class MouseHandler {
 		this.y = 0;
 
 		// Mouse control smoothing.
-		this.deceleration = 0.5;
+		this.deceleration =
+			options && options.hasOwnProperty("deceleration")
+				? options.deceleration
+				: 12;
+
+		// Mouse responsiveness.
+		this.sensitivity =
+			options && options.hasOwnProperty("sensitivity")
+				? options.sensitivity
+				: 12;
 
 		/**
 		 * Configure event listeners.
@@ -145,13 +158,21 @@ class MouseHandler {
 	 * Control the mouse's positional values over time.
 	 */
 	__input() {
-		const { deceleration } = this;
+		try {
+			const { deceleration } = this;
 
-		// Adjust the deceleration factor based on the frame rate
-		const adjustedDeceleration = deceleration * Time.deltaTime;
+			// Adjust the deceleration factor based on the frame rate
+			const adjustedDeceleration = minMax(
+				deceleration * Time.deltaTime,
+				0,
+				1
+			);
 
-		this.x *= adjustedDeceleration;
-		this.y *= adjustedDeceleration;
+			this.x *= 1 - adjustedDeceleration;
+			this.y *= 1 - adjustedDeceleration;
+		} catch (err) {
+			console.error("Failed to normalize mouse input.", err);
+		}
 	}
 
 	/**

@@ -1,21 +1,30 @@
 import { Keyboard, Mouse, Time, camera, world } from "../index.js";
-import Ray from "./Ray.js";
+import Ray from "../models/Ray.js";
 import { normalizeAngle, vectorToPosition } from "../util/Math.js";
 
 /**
  * The player object and its relative data and functions.
  */
-class Player {
-	constructor(x = 0, y = 0) {
+class PlayerController {
+	/**
+	 * @param {number} x The player's starting x-position in pixels.
+	 * @param {number} y The player's starting y-position in pixels.
+	 * @param {*} options The player options object to pass through.
+	 * @param {number} options.speed The player's movement speed in pixels per (averaged) frame. (default `200`)
+	 */
+	constructor(x = 0, y = 0, options) {
 		this.x = x;
 		this.y = y;
 
-		this.speed = 200;
+		this.speed =
+			options && options.hasOwnProperty("speed") ? options.speed : 200;
 
 		this.angle = 0.1;
-		this.mouseSensitivity = 3600;
 	}
 
+	/**
+	 * Handle user input.
+	 */
 	input() {
 		try {
 			const {
@@ -30,7 +39,9 @@ class Player {
 				shift,
 			} = Keyboard.keys;
 
-			const { speed, mouseSensitivity } = this;
+			const { sensitivity } = Mouse;
+
+			const { speed } = this;
 
 			let speedMultiplier = 1;
 
@@ -113,11 +124,11 @@ class Player {
 			if (this.y > world.height - 1) this.y = world.height - 1;
 
 			// Rotation.
-			this.angle += Mouse.x * (mouseSensitivity * Time.deltaTime);
+			this.angle += Mouse.x * (sensitivity * Time.deltaTime);
 
 			// * Time.deltaTime;
 
-			// this.angle = normalizeAngle(this.angle);
+			this.angle = normalizeAngle(this.angle);
 		} catch (err) {
 			console.error("Failed to take player input.", err);
 		}
@@ -141,14 +152,14 @@ class Player {
 
 			ctx.strokeStyle = "pink";
 
-			const [lX, lY] = vectorToPosition(angle - fov / 2, 50);
+			const [lX, lY] = vectorToPosition(angle - fov / 2, grid);
 
 			ctx.moveTo(Math.round(x), Math.round(y));
 			ctx.lineTo(lX + x, lY + y);
 
 			ctx.stroke();
 
-			const [rX, rY] = vectorToPosition(angle + fov / 2, 50);
+			const [rX, rY] = vectorToPosition(angle + fov / 2, grid);
 
 			ctx.moveTo(Math.round(x), Math.round(y));
 			ctx.lineTo(rX + x, rY + y);
@@ -176,4 +187,4 @@ class Player {
 	}
 }
 
-export default Player;
+export default PlayerController;

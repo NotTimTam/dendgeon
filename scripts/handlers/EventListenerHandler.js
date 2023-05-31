@@ -10,8 +10,12 @@ class EventListenerHandler {
 	 * @returns The newly created event listener.
 	 */
 	static addEventListener(type, callback, altTarget) {
-		if (!altTarget) altTarget = window;
-		return altTarget.addEventListener(type, callback);
+		try {
+			if (!altTarget) altTarget = window;
+			return altTarget.addEventListener(type, callback);
+		} catch (err) {
+			console.error("Failed to create an event listener.", err);
+		}
 	}
 }
 

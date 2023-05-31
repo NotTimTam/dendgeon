@@ -11,8 +11,10 @@ class RenderHandler {
 	/**
 	 *
 	 * @param {string} renderMode The default render mode. (`3d` or `2d`)
+	 * @param {*} options The renderer options object to pass through.
+	 * @param {number} options.resolution The renderer's horizontal resolution. Must be an integer. (default `320` or `640`)
 	 */
-	constructor(renderMode = "3d") {
+	constructor(renderMode = "3d", options) {
 		// Grab the canvas element and it's context.
 		this.canvas = document.querySelector("canvas#render-target");
 		this.ctx = this.canvas.getContext("2d");
@@ -34,7 +36,12 @@ class RenderHandler {
 		 * style attribute of the canvas element.
 		 */
 		this.__rawResolution = 320; // 640x480 is ideal.
-		this.__2dScaleFactor = 0.5;
+		if (options && options.hasOwnProperty("resolution"))
+			this.resolution = options.resolution;
+		this.__2dScaleFactor =
+			options && options.hasOwnProperty("__2dScaleFactor")
+				? options.__2dScaleFactor
+				: 0.5;
 		this.resize();
 
 		// Bind the render loop to the renderer.
@@ -134,7 +141,11 @@ class RenderHandler {
 	 * Start the rendering loop.
 	 */
 	start() {
-		requestAnimationFrame(this.loop);
+		try {
+			requestAnimationFrame(this.loop);
+		} catch (err) {
+			console.error("Failed to initialize render loop.", err);
+		}
 	}
 
 	/**
