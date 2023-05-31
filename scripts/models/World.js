@@ -345,7 +345,7 @@ class World {
 
 			ctx.closePath();
 
-			// Apply light filter for distance.
+			// Apply vertical shading.
 			ctx.beginPath();
 
 			ctx.fillStyle = `rgba(0,0,0, ${0.5 - opaq})`;
@@ -358,6 +358,28 @@ class World {
 			);
 
 			ctx.closePath();
+
+			// Apply horizontal shading.
+			const horizontalShadowClamp = shadowClamp(
+				hitPos % wallLength,
+				0.1,
+				0.9
+			);
+
+			if (horizontalShadowClamp !== 1) {
+				ctx.beginPath();
+
+				ctx.fillStyle = `rgba(0,0,0, ${horizontalShadowClamp - 0.9})`;
+
+				ctx.fillRect(
+					i,
+					halfHeight - wallHeight / 2 - textureOverlapCompensation,
+					resolutionDegradation,
+					wallHeight + textureOverlapCompensation * 2
+				);
+
+				ctx.closePath();
+			}
 		}
 	}
 

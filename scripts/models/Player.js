@@ -115,7 +115,6 @@ class Player {
 			// Rotation.
 			this.angle += Mouse.x * (mouseSensitivity * Time.deltaTime);
 
-	
 			// * Time.deltaTime;
 
 			// this.angle = normalizeAngle(this.angle);
@@ -144,14 +143,14 @@ class Player {
 
 			const [lX, lY] = vectorToPosition(angle - fov / 2, 50);
 
-			ctx.moveTo(x, y);
+			ctx.moveTo(Math.round(x), Math.round(y));
 			ctx.lineTo(lX + x, lY + y);
 
 			ctx.stroke();
 
 			const [rX, rY] = vectorToPosition(angle + fov / 2, 50);
 
-			ctx.moveTo(x, y);
+			ctx.moveTo(Math.round(x), Math.round(y));
 			ctx.lineTo(rX + x, rY + y);
 
 			ctx.stroke();
@@ -163,7 +162,12 @@ class Player {
 
 			ctx.fillStyle = "limegreen";
 
-			ctx.fillRect(x - grid / 12, y - grid / 12, grid / 6, grid / 6);
+			ctx.fillRect(
+				Math.round(x - grid / 12),
+				Math.round(y - grid / 12),
+				Math.round(grid / 6),
+				Math.round(grid / 6)
+			);
 
 			ctx.closePath();
 		} catch (err) {

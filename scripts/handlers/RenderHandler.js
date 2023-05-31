@@ -34,6 +34,7 @@ class RenderHandler {
 		 * style attribute of the canvas element.
 		 */
 		this.__rawResolution = 320; // 640x480 is ideal.
+		this.__2dScaleFactor = 0.5;
 		this.resize();
 
 		// Bind the render loop to the renderer.
@@ -95,17 +96,17 @@ class RenderHandler {
 	 */
 	render2d() {
 		try {
-			const { ctx } = this;
+			const { ctx, __2dScaleFactor } = this;
 
 			ctx.save();
 
 			ctx.setTransform(
-				1,
+				__2dScaleFactor,
 				0,
 				0,
-				1,
-				-camera.x + ctx.canvas.width / 2,
-				-camera.y + ctx.canvas.height / 2
+				__2dScaleFactor,
+				-(camera.x * __2dScaleFactor) + ctx.canvas.width / 2,
+				-(camera.y * __2dScaleFactor) + ctx.canvas.height / 2
 			);
 
 			world.render2d(ctx);

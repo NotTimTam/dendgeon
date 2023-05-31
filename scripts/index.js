@@ -32,6 +32,6 @@ export const Mouse = new MouseHandler(Renderer);
  */
 export const camera = new Camera();
 export const player = new Player();
-export const world = new World("dev_01");
+export const world = new World("dev_02");
 
 Renderer.start();
