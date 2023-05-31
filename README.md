@@ -1,4 +1,4 @@
-﻿# Dendgeon V. 2.0.0
+﻿# Dendgeon V2.0.0
 
 <sub><sup>Get it? It's a play on words of dungeon and engine... 😐</sup></sub>
 
