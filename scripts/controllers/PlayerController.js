@@ -124,7 +124,11 @@ class PlayerController {
 			if (this.y > world.height - 1) this.y = world.height - 1;
 
 			// Rotation.
-			this.angle += Mouse.x * (sensitivity * Time.deltaTime);
+			// this.angle += Mouse.x * (sensitivity * Time.deltaTime);
+
+			this.angle += Mouse.x - (this.lastMouseX || 0);
+
+			this.lastMouseX = Mouse.x;
 
 			// * Time.deltaTime;
 

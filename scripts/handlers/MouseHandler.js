@@ -1,7 +1,7 @@
 /**
  * Imports
  */
-import { Time } from "../index.js";
+import { Renderer, Time } from "../index.js";
 import { minMax } from "../util/Math.js";
 import EventListenerHandler from "./EventListenerHandler.js";
 
@@ -13,7 +13,6 @@ class MouseHandler {
 	 * @param {RenderHandler} renderer The current renderer being used.
 	 * @param {*} options The mouse options object to pass through.
 	 * @param {number} options.damping The damping factor for normalizing mouse movement. (default `12`)
-	 * @param {number} options.sensitivity Control over mouse sensitivity for player input. (default `12`)
 	 */
 	constructor(renderer, options) {
 		// Save a reference to the renderer.
@@ -26,15 +25,12 @@ class MouseHandler {
 		this.x = 0;
 		this.y = 0;
 
+		this.radius = 20;
+		this.lastX = 0;
+
 		// Mouse control smoothing.
 		this.damping =
-			options && options.hasOwnProperty("damping") ? options.damping : 12;
-
-		// Mouse responsiveness.
-		this.sensitivity =
-			options && options.hasOwnProperty("sensitivity")
-				? options.sensitivity
-				: 12;
+			options && options.hasOwnProperty("damping") ? options.damping : 2;
 
 		/**
 		 * Configure event listeners.
@@ -77,24 +73,24 @@ class MouseHandler {
 	__mouseMove(e) {
 		try {
 			const { movementX, movementY } = e;
+			const { canvas } = Renderer;
+			const { radius, damping } = this;
 
-			this.x = movementX;
-			this.y = movementY;
-			// const { clientX, clientY } = e;
-			// const {
-			// 	renderer: { canvas },
-			// } = this;
+			this.x += movementX / damping;
+			this.y += movementY / damping;
 
-			// const { left, right, top, bottom, width, height } =
-			// 	canvas.getBoundingClientRect();
-
-			// this.__rawX = clientX;
-			// this.__rawY = clientY;
-
-			// this.x = ((clientX - left) / (right - left)) * width;
-			// this.y = ((clientY - top) / (bottom - top)) * height;
-
-			// console.log(`${this.x}, ${this.y}`);
+			if (this.x > canvas.width + radius) {
+				this.x = -radius;
+			}
+			if (this.y > canvas.height + radius) {
+				this.y = -radius;
+			}
+			if (this.x < -radius) {
+				this.x = canvas.width + radius;
+			}
+			if (this.y < -radius) {
+				this.y = canvas.height + radius;
+			}
 		} catch (err) {
 			console.error("Failed to handle mouse movement.", err);
 		}
@@ -162,8 +158,10 @@ class MouseHandler {
 			// Adjust the deceleration factor based on the frame rate
 			const adjustedDamping = minMax(damping * Time.deltaTime, 0, 1);
 
-			this.x *= 1 - adjustedDamping;
-			this.y *= 1 - adjustedDamping;
+			// console.log((1 - adjustedDamping).toFixed(2));
+
+			// this.x *= adjustedDamping;
+			// this.y *= adjustedDamping;
 		} catch (err) {
 			console.error("Failed to normalize mouse input.", err);
 		}

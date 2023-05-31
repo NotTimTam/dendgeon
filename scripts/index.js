@@ -20,8 +20,7 @@ import WorldController from "./controllers/WorldController.js";
 
 export const masterConfig = {
 	mouse: {
-		damping: 12,
-		sensitivity: 12,
+		damping: 4,
 	},
 	renderer: {
 		resolution: 320,
