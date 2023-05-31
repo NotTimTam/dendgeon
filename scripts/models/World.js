@@ -50,20 +50,29 @@ class World {
 	 * @param {Array} dimensions The 2d array of the world's dimensions.
 	 */
 	__normalizeStructures(structures, dimensions) {
+		const { grid } = this;
+
 		for (const structure of structures) {
-			if (structure[0] === "wall") {
+			if (structure.type === "wall") {
 				const [width, height] = dimensions;
-				const [_, sX, sY, eX, eY] = structure;
+				const [sX, sY, eX, eY] = structure.coords;
 
-				if (sX < 0) structure[1] = 0;
-				if (sY < 0) structure[2] = 0;
-				if (eX < 0) structure[3] = 0;
-				if (eY < 0) structure[4] = 0;
+				if (sX < 0) structure.coords[0] = 0;
+				if (sY < 0) structure.coords[1] = 0;
+				if (eX < 0) structure.coords[2] = 0;
+				if (eY < 0) structure.coords[3] = 0;
 
-				if (sX > width) structure[1] = width;
-				if (sY > height) structure[2] = height;
-				if (eX > width) structure[3] = width;
-				if (eY > height) structure[4] = height;
+				if (sX > width) structure.coords[0] = width;
+				if (sY > height) structure.coords[1] = height;
+				if (eX > width) structure.coords[2] = width;
+				if (eY > height) structure.coords[3] = height;
+
+				structure.coords = [
+					structure.coords[0] * grid,
+					structure.coords[1] * grid,
+					structure.coords[2] * grid,
+					structure.coords[3] * grid,
+				];
 			} else continue;
 		}
 
@@ -91,15 +100,9 @@ class World {
 				level: { spawn },
 			} = this;
 
-			this.walls = this.level.structures
-				.filter(([type]) => type === "wall")
-				.map(([_, sX, sY, eX, eY]) => [
-					_,
-					sX * grid,
-					sY * grid,
-					eX * grid,
-					eY * grid,
-				]);
+			this.walls = this.level.structures.filter(
+				({ type }) => type === "wall"
+			);
 
 			// Configure objects.
 			player.x = spawn[0] * grid;
@@ -140,17 +143,17 @@ class World {
 	 * @param {Array<number>} wall The wall coordinates to render.
 	 */
 	__2dWall(ctx, wall) {
-		const { grid, level } = this;
+		const { grid } = this;
 
-		const [_, sX, sY, eX, eY] = wall;
+		const [sX, sY, eX, eY] = wall.coords;
 
 		ctx.beginPath();
 
 		ctx.strokeStyle = "blue";
 		ctx.lineWidth = grid / 12;
 
-		ctx.moveTo(sX * grid, sY * grid);
-		ctx.lineTo(eX * grid, eY * grid);
+		ctx.moveTo(sX, sY);
+		ctx.lineTo(eX, eY);
 		ctx.stroke();
 
 		ctx.closePath();
@@ -165,7 +168,7 @@ class World {
 		const { structures } = level;
 
 		for (const structure of structures) {
-			switch (structure[0]) {
+			switch (structure.type) {
 				case "wall":
 					this.__2dWall(ctx, structure);
 					break;
@@ -288,13 +291,13 @@ class World {
 		// 	});
 
 		for (let i = 0; i < width; i += resolutionDegradation) {
-			const a = angle + fov * (i / width) + -fov / 2;
-			const ray = new Ray(x, y, a).cast(3, renderDistance);
+			const rAngle = angle + fov * (i / width) + -fov / 2;
+			const ray = new Ray(x, y, rAngle).cast(3, renderDistance);
 
 			const distance = calculateDistance(x, y, ray.x, ray.y);
 
 			const perpendicularDistance =
-				distance * Math.cos(degreeToRadian(a - angle));
+				distance * Math.cos(degreeToRadian(rAngle - angle));
 
 			const wallHeight =
 				(wallHeightGridRatio / perpendicularDistance) *
@@ -303,11 +306,11 @@ class World {
 
 			if (!ray.hit) continue;
 
-			const [hitPos, wallLength] = ray.hit;
+			const [hitPos, wallLength, wall] = ray.hit;
 
-			const textureX =
-				((wallLength / textureRepeatFactor) * (hitPos % wallLength)) %
-				wallTexture.width;
+			// const textureX =
+			// 	((wallLength / textureRepeatFactor) * (hitPos % wallLength)) %
+			// 	wallTexture.width;
 
 			const opaq =
 				((lightDistance - calculateDistance(x, y, ray.x, ray.y)) /
@@ -315,17 +318,32 @@ class World {
 				shadowClamp(hitPos, 0.01, 0.99);
 
 			// Draw the textured wall
-			ctx.drawImage(
-				wallTexture,
-				textureX, // Grab X
-				0, // Grab Y
-				resolutionDegradation, // Grab Width
-				wallTexture.height, // Grab Height
-				i, // Draw X
-				halfHeight - wallHeight / 2, // Draw Y
-				resolutionDegradation, // Draw width
-				wallHeight // Draw Height
+			// ctx.drawImage(
+			// 	wallTexture,
+			// 	textureX, // Grab X
+			// 	0, // Grab Y
+			// 	resolutionDegradation, // Grab Width
+			// 	wallTexture.height, // Grab Height
+			// 	i, // Draw X
+			// 	halfHeight - wallHeight / 2, // Draw Y
+			// 	resolutionDegradation, // Draw width
+			// 	wallHeight // Draw Height
+			// );
+
+			// Draw a colored wall.
+			const [r, g, b, a] = wall.color || [100, 100, 100, 1];
+			ctx.beginPath();
+
+			ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a || 1})`;
+
+			ctx.fillRect(
+				i,
+				halfHeight - wallHeight / 2,
+				resolutionDegradation,
+				wallHeight
 			);
+
+			ctx.closePath();
 
 			// Apply light filter for distance.
 			ctx.beginPath();
@@ -344,7 +362,7 @@ class World {
 	}
 
 	/**
-	 * Render the floor in 2d.
+	 * Render the floor and ceiling in 3d.
 	 * @param {CanvasRenderingContext2D} ctx The render context.
 	 */
 	__3dFloorAndCeiling(ctx) {

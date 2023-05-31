@@ -13,7 +13,7 @@ class Player {
 		this.speed = 200;
 
 		this.angle = 0.1;
-		this.mouseSensitivity = 25;
+		this.mouseSensitivity = 3600;
 	}
 
 	input() {
@@ -30,7 +30,7 @@ class Player {
 				shift,
 			} = Keyboard.keys;
 
-			const { speed } = this;
+			const { speed, mouseSensitivity } = this;
 
 			let speedMultiplier = 1;
 
@@ -113,9 +113,12 @@ class Player {
 			if (this.y > world.height - 1) this.y = world.height - 1;
 
 			// Rotation.
-			this.angle += Mouse.x * this.mouseSensitivity;
+			this.angle += Mouse.x * (mouseSensitivity * Time.deltaTime);
 
-			this.angle = normalizeAngle(this.angle);
+	
+			// * Time.deltaTime;
+
+			// this.angle = normalizeAngle(this.angle);
 		} catch (err) {
 			console.error("Failed to take player input.", err);
 		}
@@ -129,15 +132,6 @@ class Player {
 		try {
 			const { x, y, angle } = this;
 			const { grid } = world;
-
-			// Draw player.
-			ctx.beginPath();
-
-			ctx.fillStyle = "limegreen";
-
-			ctx.fillRect(x - grid / 12, y - grid / 12, grid / 6, grid / 6);
-
-			ctx.closePath();
 
 			// Draw player viewport.
 
@@ -161,6 +155,15 @@ class Player {
 			ctx.lineTo(rX + x, rY + y);
 
 			ctx.stroke();
+
+			ctx.closePath();
+
+			// Draw player.
+			ctx.beginPath();
+
+			ctx.fillStyle = "limegreen";
+
+			ctx.fillRect(x - grid / 12, y - grid / 12, grid / 6, grid / 6);
 
 			ctx.closePath();
 		} catch (err) {

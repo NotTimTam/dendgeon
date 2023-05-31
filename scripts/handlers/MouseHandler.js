@@ -146,8 +146,12 @@ class MouseHandler {
 	 */
 	__input() {
 		const { deceleration } = this;
-		this.x *= deceleration * Time.deltaTime;
-		this.y *= deceleration * Time.deltaTime;
+
+		// Adjust the deceleration factor based on the frame rate
+		const adjustedDeceleration = deceleration * Time.deltaTime;
+
+		this.x *= adjustedDeceleration;
+		this.y *= adjustedDeceleration;
 	}
 
 	/**

@@ -52,10 +52,10 @@ class Ray {
 					const [hit, hitPosition, wallLength] =
 						this.checkRayWallIntersection(
 							[...this.start, this.x, this.y],
-							line
+							line.coords
 						);
 					if (hit) {
-						this.hit = [hitPosition, wallLength];
+						this.hit = [hitPosition, wallLength, line];
 
 						return this;
 					}
@@ -143,7 +143,7 @@ class Ray {
 		const linesWithinDistance = [];
 
 		for (const line of lineSegments) {
-			const [_, x1, y1, x2, y2] = line;
+			const [x1, y1, x2, y2] = line.coords;
 
 			// Calculate the distance between the point (x, y) and the line segment
 			const segmentDistance = pointToLineDistance(x, y, x1, y1, x2, y2);
@@ -164,7 +164,7 @@ class Ray {
 	 */
 	checkRayWallIntersection(ray, wall) {
 		const [a, b, c, d] = ray;
-		const [, p, q, r, s] = wall;
+		const [p, q, r, s] = wall;
 
 		const det = (c - a) * (s - q) - (r - p) * (d - b);
 		if (det === 0) {

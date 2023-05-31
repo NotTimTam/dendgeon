@@ -16,11 +16,13 @@ import World from "./models/World.js";
  * Configuration
  */
 
+export const fpsDisp = document.querySelector("p#fps");
+
 /**
  * Handlers
  */
 export const Time = new TimeHandler();
-export const Renderer = new RenderHandler();
+export const Renderer = new RenderHandler("both");
 export const Events = new EventListenerHandler();
 export const Keyboard = new KeyboardHandler();
 export const Mouse = new MouseHandler(Renderer);

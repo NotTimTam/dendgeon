@@ -1,7 +1,7 @@
 /**
  * Imports
  */
-import { Mouse, Time, camera, player, world } from "../index.js";
+import { Mouse, Time, camera, fpsDisp, player, world } from "../index.js";
 import { degreeToRadian } from "../util/Math.js";
 
 /**
@@ -150,6 +150,7 @@ class RenderHandler {
 
 			// Logic
 			Time.execute(); // Calculate deltaTime and FPS.
+			fpsDisp.innerText = Math.round(Time.fps);
 
 			// Render
 			this.clear(); // Clear the screen each frame.

@@ -1,16 +1,12 @@
 const levels = {
 	dev_01: {
 		dimensions: [32, 32],
-		spawn: [20, 20, 260],
+		spawn: [1.5, 1.5, 260],
 		structures: [
-			["wall", 0, 0, 32, 0],
-			["wall", 0, 0, 0, 32],
-			["wall", 32, 0, 32, 32],
-			["wall", 0, 32, 32, 32],
-			["wall", 0, 0, 6, 6],
-			["wall", 6, 6, 10, 4],
-
-			// ["wall", 0, 4, 1, 4],
+			{ type: "wall", coords: [0, 0, 32, 0] },
+			{ type: "wall", coords: [0, 0, 0, 32] },
+			{ type: "wall", coords: [32, 0, 32, 32] },
+			{ type: "wall", coords: [0, 32, 32, 32] },
 		],
 	},
 };
