@@ -524,16 +524,16 @@ class WorldController {
 
 			if (oX < 0 || oY < 0 || oX > width || oY > height) continue;
 
-			//  WHY IS THE ANGLE SOMETIMES NOT WORKING
-			const a = normalizeAngle(calculateAngle([x, y], [oX, oY]));
+			const playerToSpriteAngle = calculateAngle([x, y], [oX, oY]);
+			const angleDifference = normalizeAngle(playerToSpriteAngle - angle);
 
 			if (
-				a < normalizeAngle(angle - fov / 2) ||
-				a > normalizeAngle(angle + fov / 2)
+				Math.abs(angleDifference) > fov / 2 &&
+				Math.abs(angleDifference) < 360 - fov / 2
 			)
 				continue;
 
-			const ray = new Ray(x, y, a).cast(
+			const ray = new Ray(x, y, playerToSpriteAngle).cast(
 				resolutionDegradation,
 				renderDistance,
 				[sprite.x, sprite.y, sprite.angle, sprite.width]
